@@ -86,26 +86,28 @@
             z-index: 15;
         }
 
-        /* Professional Top Panel */
+        /* Top Panel with enhanced mobile support */
         .top-panel {
             position: absolute;
-            top: env(safe-area-inset-top, 20px);
-            left: 20px;
-            right: 20px;
+            top: env(safe-area-inset-top, 10px);
+            left: 10px;
+            right: 10px;
             z-index: 20;
             background: var(--glass-bg);
             backdrop-filter: blur(40px);
             border-radius: 16px;
-            padding: 20px;
+            padding: 16px;
             pointer-events: all;
             border: 1px solid var(--glass-border);
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
             transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            max-height: 85vh;
+            overflow-y: auto;
         }
 
         .top-panel.collapsed {
-            transform: translateY(-90%);
-            opacity: 0.7;
+            transform: translateY(-85%);
+            opacity: 0.8;
         }
 
         .panel-header {
@@ -113,10 +115,12 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .app-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: var(--text-primary);
         }
@@ -124,6 +128,8 @@
         .toggle-controls {
             display: flex;
             gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
         .control-btn {
@@ -139,6 +145,7 @@
             cursor: pointer;
             transition: all 0.2s;
             font-size: 14px;
+            min-width: 32px;
         }
 
         .control-btn:hover {
@@ -169,6 +176,7 @@
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.2s;
+            min-width: 40px;
         }
 
         .lang-btn.active {
@@ -220,18 +228,19 @@
         /* Professional Metrics Grid */
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 8px;
             margin-bottom: 16px;
         }
 
         .metric-card {
             background: var(--secondary-color);
             border: 1px solid var(--border-color);
-            padding: 14px 10px;
+            padding: 12px 8px;
             border-radius: 12px;
             text-align: center;
             transition: all 0.2s;
+            min-width: 100px;
         }
 
         .metric-card:hover {
@@ -240,7 +249,7 @@
         }
 
         .metric-label {
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-muted);
             margin-bottom: 4px;
             text-transform: uppercase;
@@ -249,7 +258,7 @@
         }
 
         .metric-value {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
             color: var(--text-primary);
             font-variant-numeric: tabular-nums;
@@ -258,21 +267,22 @@
         /* Status Grid */
         .status-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
         }
 
         .status-card {
             background: var(--secondary-color);
             border: 1px solid var(--border-color);
-            padding: 12px;
+            padding: 10px;
             border-radius: 10px;
             text-align: center;
             transition: all 0.2s;
+            min-width: 120px;
         }
 
         .status-label {
-            font-size: 10px;
+            font-size: 9px;
             color: var(--text-muted);
             margin-bottom: 4px;
             text-transform: uppercase;
@@ -280,7 +290,7 @@
         }
 
         .status-value {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--text-primary);
             font-variant-numeric: tabular-nums;
@@ -343,7 +353,7 @@
             backdrop-filter: blur(10px);
             padding: 4px 8px;
             border-radius: 6px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 500;
             white-space: nowrap;
             border: 1px solid var(--glass-border);
@@ -406,8 +416,8 @@
             position: absolute;
             bottom: env(safe-area-inset-bottom, 20px);
             right: 20px;
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
         }
 
         .compass {
@@ -421,7 +431,7 @@
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            font-size: 16px;
+            font-size: 14px;
             position: relative;
             overflow: hidden;
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
@@ -430,7 +440,7 @@
         .compass-needle {
             position: absolute;
             width: 3px;
-            height: 45px;
+            height: 35px;
             background: var(--danger-color);
             top: 15px;
             left: 50%;
@@ -448,15 +458,15 @@
         .compass-mark {
             position: absolute;
             width: 2px;
-            height: 10px;
+            height: 8px;
             background: var(--text-muted);
             left: 50%;
             top: 5px;
-            transform-origin: 50% 55px;
+            transform-origin: 50% 45px;
         }
 
         .compass-mark.major {
-            height: 15px;
+            height: 12px;
             width: 3px;
             background: var(--text-primary);
         }
@@ -466,11 +476,11 @@
             position: absolute;
             bottom: env(safe-area-inset-bottom, 20px);
             left: 20px;
-            right: 140px;
+            right: 130px;
             background: var(--glass-bg);
             backdrop-filter: blur(40px);
             border-radius: 16px;
-            padding: 20px;
+            padding: 16px;
             border: 1px solid var(--glass-border);
             text-align: center;
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
@@ -478,20 +488,20 @@
         }
 
         .alignment-panel.collapsed {
-            transform: translateY(90%);
-            opacity: 0.7;
+            transform: translateY(75%);
+            opacity: 0.8;
         }
 
         .alignment-status {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .alignment-details {
-            font-size: 14px;
+            font-size: 12px;
             color: var(--text-secondary);
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             line-height: 1.4;
         }
 
@@ -501,7 +511,7 @@
             background: var(--secondary-color);
             border-radius: 3px;
             overflow: hidden;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             border: 1px solid var(--border-color);
         }
 
@@ -513,7 +523,7 @@
         }
 
         .signal-text {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             font-variant-numeric: tabular-nums;
         }
@@ -527,9 +537,9 @@
             background: var(--glass-bg);
             backdrop-filter: blur(40px);
             border-radius: 12px;
-            padding: 16px;
+            padding: 14px;
             border: 1px solid var(--glass-border);
-            max-width: 280px;
+            max-width: 250px;
             opacity: 0;
             transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
@@ -540,14 +550,14 @@
         }
 
         .sat-name {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             color: var(--text-primary);
         }
 
         .sat-details {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-secondary);
             line-height: 1.5;
         }
@@ -557,7 +567,7 @@
             font-weight: 500;
         }
 
-        /* Coordinate Display */
+        /* Coordinates Display */
         .coordinates-display {
             position: absolute;
             top: 50%;
@@ -566,22 +576,22 @@
             background: var(--glass-bg);
             backdrop-filter: blur(40px);
             border-radius: 12px;
-            padding: 16px;
+            padding: 14px;
             border: 1px solid var(--glass-border);
-            min-width: 200px;
+            min-width: 180px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
             transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         .coordinates-display.collapsed {
-            transform: translateY(-50%) translateX(90%);
-            opacity: 0.7;
+            transform: translateY(-50%) translateX(85%);
+            opacity: 0.8;
         }
 
         .coord-header {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 600;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             color: var(--text-primary);
             text-align: center;
         }
@@ -589,8 +599,8 @@
         .coord-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 12px;
+            margin-bottom: 6px;
+            font-size: 11px;
         }
 
         .coord-label {
@@ -601,6 +611,39 @@
             color: var(--text-primary);
             font-weight: 500;
             font-variant-numeric: tabular-nums;
+        }
+
+        /* Toggle show/hide button - improved visibility */
+        .toggle-show-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px);
+            border: 2px solid var(--accent-color);
+            border-radius: 50%;
+            color: var(--text-primary);
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 30;
+            transition: all 0.3s;
+            display: none;
+            pointer-events: all;
+            box-shadow: 0 4px 20px rgba(0,102,204,0.3);
+        }
+
+        .toggle-show-btn.visible {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toggle-show-btn:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 6px 25px rgba(0,102,204,0.4);
         }
 
         /* Loading Screen */
@@ -619,13 +662,13 @@
         }
 
         .loading-spinner {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border: 3px solid var(--secondary-color);
             border-top: 3px solid var(--accent-color);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         @keyframes spin {
@@ -634,27 +677,27 @@
         }
 
         .loading-text {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 500;
             color: var(--text-primary);
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .loading-details {
-            font-size: 14px;
+            font-size: 12px;
             color: var(--text-secondary);
             text-align: center;
         }
 
         /* Permission Steps */
         .permission-buttons {
-            margin-top: 30px;
+            margin-top: 20px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
             align-items: center;
-            max-width: 400px;
+            max-width: 350px;
         }
 
         .permission-step {
@@ -663,29 +706,29 @@
         }
 
         .step-title {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: var(--text-primary);
         }
 
         .step-description {
-            font-size: 14px;
+            font-size: 12px;
             color: var(--text-secondary);
             line-height: 1.4;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .btn {
             background: var(--accent-color);
             color: var(--text-primary);
             border: none;
-            padding: 14px 28px;
+            padding: 12px 24px;
             border-radius: 12px;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 500;
             cursor: pointer;
-            min-width: 200px;
+            min-width: 180px;
             transition: all 0.2s;
             border: 1px solid transparent;
         }
@@ -720,87 +763,128 @@
             transform: translate(-50%, -50%);
             background: var(--glass-bg);
             backdrop-filter: blur(40px);
-            padding: 30px;
+            padding: 20px;
             border-radius: 16px;
             text-align: center;
-            max-width: 350px;
+            max-width: 300px;
             border: 1px solid var(--danger-color);
             box-shadow: 0 8px 32px rgba(220,53,69,0.3);
             z-index: 200;
         }
 
         .error-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             color: var(--danger-color);
         }
 
         .error-message {
-            font-size: 14px;
+            font-size: 12px;
             color: var(--text-secondary);
             line-height: 1.4;
         }
 
-        /* Professional Toggle Switch */
-        .toggle-switch {
-            position: relative;
-            width: 44px;
-            height: 24px;
-            background: var(--secondary-color);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid var(--border-color);
-        }
-
-        .toggle-switch.active {
-            background: var(--accent-color);
-        }
-
-        .toggle-handle {
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 18px;
-            height: 18px;
-            background: var(--text-primary);
-            border-radius: 50%;
-            transition: all 0.2s;
-        }
-
-        .toggle-switch.active .toggle-handle {
-            transform: translateX(20px);
-        }
-
-        /* Responsive Design */
+        /* Mobile Responsive Design */
         @media (max-width: 480px) {
             .top-panel {
-                left: 10px;
-                right: 10px;
-                padding: 16px;
+                top: env(safe-area-inset-top, 5px);
+                left: 5px;
+                right: 5px;
+                padding: 12px;
+            }
+
+            .app-title {
+                font-size: 14px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+            }
+
+            .status-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
             }
 
             .alignment-panel {
-                left: 10px;
-                right: 130px;
-                padding: 16px;
+                left: 5px;
+                right: 110px;
+                padding: 12px;
             }
 
             .compass-container {
-                right: 10px;
-                width: 100px;
-                height: 100px;
+                right: 5px;
+                width: 80px;
+                height: 80px;
+            }
+
+            .compass {
+                font-size: 12px;
+            }
+
+            .compass-needle {
+                height: 25px;
+                top: 15px;
             }
 
             .satellite-info {
-                left: 10px;
-                max-width: 240px;
+                left: 5px;
+                max-width: 200px;
+                padding: 12px;
             }
 
             .coordinates-display {
-                right: 10px;
-                min-width: 180px;
+                right: 5px;
+                min-width: 150px;
+                padding: 12px;
+            }
+
+            .metric-value {
+                font-size: 16px;
+            }
+
+            .status-value {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .metrics-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 4px;
+            }
+
+            .metric-card {
+                padding: 8px 4px;
+                min-width: 80px;
+            }
+
+            .metric-value {
+                font-size: 14px;
+            }
+
+            .metric-label {
+                font-size: 9px;
+            }
+
+            .status-card {
+                padding: 8px;
+                min-width: 100px;
+            }
+
+            .app-title {
+                font-size: 12px;
+            }
+
+            .compass-container {
+                width: 70px;
+                height: 70px;
+            }
+
+            .alignment-panel {
+                right: 85px;
             }
         }
 
@@ -826,39 +910,39 @@
     <!-- Loading Screen -->
     <div id="loadingScreen" class="loading-screen">
         <div class="loading-spinner"></div>
-        <div class="loading-text" data-key="loading.title">Initializing System</div>
-        <div id="loadingDetails" class="loading-details" data-key="loading.details">Starting up...</div>
+        <div class="loading-text" data-key="loading.title">جاري تهيئة النظام</div>
+        <div id="loadingDetails" class="loading-details" data-key="loading.details">بدء التشغيل...</div>
         
         <div id="permissionButtons" class="permission-buttons" style="display: none;">
             <div class="permission-step">
-                <div class="step-title" data-key="permissions.camera.title">Camera Access Required</div>
-                <div class="step-description" data-key="permissions.camera.description">We need camera access to display the real sky view</div>
+                <div class="step-title" data-key="permissions.camera.title">صلاحية الكاميرا مطلوبة</div>
+                <div class="step-description" data-key="permissions.camera.description">نحتاج للكاميرا لعرض الاتجاه الحقيقي للسماء</div>
                 <button class="btn" id="cameraBtn" onclick="requestCameraPermission()">
-                    <span data-key="permissions.camera.button">Grant Camera Access</span>
+                    <span data-key="permissions.camera.button">منح صلاحية الكاميرا</span>
                 </button>
             </div>
 
             <div class="permission-step">
-                <div class="step-title" data-key="permissions.location.title">Location Access Required</div>
-                <div class="step-description" data-key="permissions.location.description">We need your location to calculate satellite positions accurately</div>
+                <div class="step-title" data-key="permissions.location.title">صلاحية الموقع مطلوبة</div>
+                <div class="step-description" data-key="permissions.location.description">نحتاج موقعك لحساب اتجاه الأقمار الصناعية بدقة</div>
                 <button class="btn" id="locationBtn" onclick="requestLocationPermission()" disabled>
-                    <span data-key="permissions.location.button">Grant Location Access</span>
+                    <span data-key="permissions.location.button">منح صلاحية الموقع</span>
                 </button>
             </div>
 
             <div class="permission-step">
-                <div class="step-title" data-key="permissions.sensors.title">Device Sensors Required</div>
-                <div class="step-description" data-key="permissions.sensors.description">We need compass and orientation sensors to detect device direction</div>
+                <div class="step-title" data-key="permissions.sensors.title">صلاحية أجهزة الاستشعار مطلوبة</div>
+                <div class="step-description" data-key="permissions.sensors.description">نحتاج البوصلة ومقياس الإمالة لتحديد اتجاه الجهاز</div>
                 <button class="btn" id="orientationBtn" onclick="requestOrientationPermission()" disabled>
-                    <span data-key="permissions.sensors.button">Grant Sensor Access</span>
+                    <span data-key="permissions.sensors.button">منح صلاحية الاستشعار</span>
                 </button>
             </div>
 
             <div class="permission-step" id="startStep" style="display: none;">
-                <div class="step-title" data-key="permissions.complete.title">All Permissions Granted</div>
-                <div class="step-description" data-key="permissions.complete.description">You can now use the application with full capabilities</div>
+                <div class="step-title" data-key="permissions.complete.title">تم منح جميع الصلاحيات</div>
+                <div class="step-description" data-key="permissions.complete.description">يمكنك الآن استخدام التطبيق بكامل إمكانياته</div>
                 <button class="btn success" onclick="finishSetup()">
-                    <span data-key="permissions.complete.button">Launch Application</span>
+                    <span data-key="permissions.complete.button">تشغيل التطبيق</span>
                 </button>
             </div>
         </div>
@@ -878,8 +962,12 @@
             </div>
         </div>
         <div id="satelliteMarkers"></div>
-        <div id="horizonLine" class="horizon-line"></div>
     </div>
+
+    <!-- Toggle Show Button (appears when panels are hidden) -->
+    <button class="toggle-show-btn" id="toggleShowBtn" onclick="showPanels()">
+        ▲
+    </button>
 
     <!-- HUD Interface -->
     <div class="hud-overlay">
@@ -892,77 +980,49 @@
                         <button class="lang-btn active" onclick="switchLanguage('ar')">AR</button>
                         <button class="lang-btn" onclick="switchLanguage('en')">EN</button>
                     </div>
-                    <button class="control-btn" id="togglePanels" onclick="togglePanels()" title="Toggle Interface">
+                    <button class="control-btn" id="togglePanels" onclick="togglePanels()" title="إخفاء/إظهار الواجهة">
                         <span>▼</span>
                     </button>
                 </div>
             </div>
             
             <div class="satellite-selector">
-                <div class="selector-label" data-key="interface.satellite.label">Satellite Selection</div>
+                <div class="selector-label" data-key="interface.satellite.label">اختيار القمر الصناعي</div>
                 <select id="satelliteSelect">
-                    <option value="" data-key="interface.satellite.placeholder">-- Select Satellite --</option>
-                    <optgroup label="Arab Satellites" data-key="satellites.arab">
-                        <option value="nilesat-201">Nilesat 201 (7°W)</option>
-                        <option value="nilesat-301">Nilesat 301 (7°W)</option>
-                        <option value="arabsat-5a">Arabsat 5A (30.5°E)</option>
-                        <option value="arabsat-5c">Arabsat 5C (20°E)</option>
-                        <option value="badr-4">Badr 4 (26°E)</option>
-                        <option value="badr-5">Badr 5 (26°E)</option>
-                        <option value="badr-6">Badr 6 (26°E)</option>
-                        <option value="badr-7">Badr 7 (26°E)</option>
-                        <option value="badr-8">Badr 8 (26°E)</option>
-                    </optgroup>
-                    <optgroup label="European Satellites" data-key="satellites.european">
-                        <option value="hotbird-13f">Hotbird 13F (13°E)</option>
-                        <option value="hotbird-13g">Hotbird 13G (13°E)</option>
-                        <option value="astra-1kr">Astra 1KR (19.2°E)</option>
-                        <option value="astra-1l">Astra 1L (19.2°E)</option>
-                        <option value="astra-1m">Astra 1M (19.2°E)</option>
-                        <option value="astra-1n">Astra 1N (19.2°E)</option>
-                        <option value="eutelsat-16a">Eutelsat 16A (16°E)</option>
-                        <option value="eutelsat-7c">Eutelsat 7C (7°E)</option>
-                    </optgroup>
-                    <optgroup label="Other Satellites" data-key="satellites.other">
-                        <option value="turksat-4a">Turksat 4A (42°E)</option>
-                        <option value="turksat-4b">Turksat 4B (42°E)</option>
-                        <option value="hispasat-30w-6">Hispasat 30W-6 (30°W)</option>
-                        <option value="intelsat-33e">Intelsat 33e (60°E)</option>
-                        <option value="amos-17">Amos 17 (17°E)</option>
-                    </optgroup>
+                    <!-- سيتم ملؤها بواسطة JavaScript -->
                 </select>
             </div>
             
             <div class="metrics-grid">
                 <div class="metric-card">
-                    <div class="metric-label" data-key="metrics.azimuth">Azimuth</div>
+                    <div class="metric-label" data-key="metrics.azimuth">الاتجاه</div>
                     <div class="metric-value" id="azimuth">--°</div>
                 </div>
                 <div class="metric-card">
-                    <div class="metric-label" data-key="metrics.elevation">Elevation</div>
+                    <div class="metric-label" data-key="metrics.elevation">الارتفاع</div>
                     <div class="metric-value" id="elevation">--°</div>
                 </div>
                 <div class="metric-card">
-                    <div class="metric-label" data-key="metrics.skew">LNB Skew</div>
+                    <div class="metric-label" data-key="metrics.skew">انحراف LNB</div>
                     <div class="metric-value" id="skew">--°</div>
                 </div>
             </div>
             
             <div class="status-grid">
                 <div class="status-card">
-                    <div class="status-label" data-key="status.compass">Device Heading</div>
+                    <div class="status-label" data-key="status.compass">بوصلة الجهاز</div>
                     <div class="status-value" id="deviceHeading">--°</div>
                 </div>
                 <div class="status-card">
-                    <div class="status-label" data-key="status.tilt">Device Tilt</div>
+                    <div class="status-label" data-key="status.tilt">إمالة الجهاز</div>
                     <div class="status-value" id="deviceTilt">--°</div>
                 </div>
                 <div class="status-card">
-                    <div class="status-label" data-key="status.accuracy">GPS Accuracy</div>
+                    <div class="status-label" data-key="status.accuracy">دقة GPS</div>
                     <div class="status-value" id="gpsAccuracy">--m</div>
                 </div>
                 <div class="status-card">
-                    <div class="status-label" data-key="status.declination">Magnetic Decl.</div>
+                    <div class="status-label" data-key="status.declination">الانحراف المغناطيسي</div>
                     <div class="status-value" id="magneticDeclination">--°</div>
                 </div>
             </div>
@@ -981,12 +1041,12 @@
 
         <!-- Alignment Status Panel -->
         <div class="alignment-panel" id="alignmentPanel">
-            <div class="alignment-status" id="alignmentStatus" data-key="status.searching">Searching for Satellite</div>
-            <div class="alignment-details" id="alignmentDetails" data-key="status.instructions">Select a satellite from above to begin</div>
+            <div class="alignment-status" id="alignmentStatus" data-key="status.searching">البحث عن القمر الصناعي</div>
+            <div class="alignment-details" id="alignmentDetails" data-key="status.instructions">اختر قمر صناعي من الأعلى للبدء</div>
             <div class="signal-strength">
                 <div class="signal-bar" id="signalBar" style="width: 0%"></div>
             </div>
-            <div class="signal-text" id="signalText" data-key="status.precision">Alignment Precision: 0%</div>
+            <div class="signal-text" id="signalText" data-key="status.precision">دقة التوجيه: 0%</div>
         </div>
 
         <!-- Satellite Information Panel -->
@@ -997,21 +1057,21 @@
 
         <!-- Coordinates Display -->
         <div class="coordinates-display" id="coordinatesDisplay">
-            <div class="coord-header" data-key="coordinates.title">Target Coordinates</div>
+            <div class="coord-header" data-key="coordinates.title">إحداثيات الهدف</div>
             <div class="coord-item">
-                <span class="coord-label" data-key="coordinates.latitude">Latitude:</span>
+                <span class="coord-label" data-key="coordinates.latitude">خط العرض:</span>
                 <span class="coord-value" id="coordLat">--</span>
             </div>
             <div class="coord-item">
-                <span class="coord-label" data-key="coordinates.longitude">Longitude:</span>
+                <span class="coord-label" data-key="coordinates.longitude">خط الطول:</span>
                 <span class="coord-value" id="coordLon">--</span>
             </div>
             <div class="coord-item">
-                <span class="coord-label" data-key="coordinates.altitude">Altitude:</span>
+                <span class="coord-label" data-key="coordinates.altitude">الارتفاع:</span>
                 <span class="coord-value" id="coordAlt">35,786 km</span>
             </div>
             <div class="coord-item">
-                <span class="coord-label" data-key="coordinates.distance">Distance:</span>
+                <span class="coord-label" data-key="coordinates.distance">المسافة:</span>
                 <span class="coord-value" id="coordDistance">-- km</span>
             </div>
         </div>
@@ -1183,7 +1243,7 @@
             const locationBtn = document.getElementById('locationBtn');
             
             try {
-                btn.textContent = t('permissions.camera.processing') || 'Processing...';
+                btn.textContent = 'جاري المعالجة...';
                 btn.disabled = true;
 
                 const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -1192,18 +1252,18 @@
                 
                 stream.getTracks().forEach(track => track.stop());
                 
-                btn.textContent = '✓ ' + t('permissions.camera.granted', 'Camera Access Granted');
+                btn.textContent = '✓ تم منح صلاحية الكاميرا';
                 btn.classList.add('success');
                 satApp.cameraPermission = true;
                 
                 locationBtn.disabled = false;
                 
             } catch (error) {
-                btn.textContent = '✗ ' + t('permissions.camera.failed', 'Camera Access Failed');
+                btn.textContent = '✗ فشل منح صلاحية الكاميرا';
                 btn.style.background = 'var(--danger-color)';
                 
                 setTimeout(() => {
-                    btn.textContent = t('permissions.camera.retry', 'Retry Camera Access');
+                    btn.textContent = 'إعادة المحاولة';
                     btn.style.background = 'var(--accent-color)';
                     btn.disabled = false;
                 }, 3000);
@@ -1215,7 +1275,7 @@
             const orientationBtn = document.getElementById('orientationBtn');
             
             try {
-                btn.textContent = t('permissions.location.processing') || 'Processing...';
+                btn.textContent = 'جاري المعالجة...';
                 btn.disabled = true;
 
                 await new Promise((resolve, reject) => {
@@ -1231,18 +1291,18 @@
                     );
                 });
                 
-                btn.textContent = '✓ ' + t('permissions.location.granted', 'Location Access Granted');
+                btn.textContent = '✓ تم منح صلاحية الموقع';
                 btn.classList.add('success');
                 satApp.locationPermission = true;
                 
                 orientationBtn.disabled = false;
                 
             } catch (error) {
-                btn.textContent = '✗ ' + t('permissions.location.failed', 'Location Access Failed');
+                btn.textContent = '✗ فشل منح صلاحية الموقع';
                 btn.style.background = 'var(--danger-color)';
                 
                 setTimeout(() => {
-                    btn.textContent = t('permissions.location.retry', 'Retry Location Access');
+                    btn.textContent = 'إعادة المحاولة';
                     btn.style.background = 'var(--accent-color)';
                     btn.disabled = false;
                 }, 3000);
@@ -1254,7 +1314,7 @@
             const startStep = document.getElementById('startStep');
             
             try {
-                btn.textContent = t('permissions.sensors.processing') || 'Processing...';
+                btn.textContent = 'جاري المعالجة...';
                 btn.disabled = true;
 
                 if (typeof DeviceOrientationEvent.requestPermission === 'function') {
@@ -1264,18 +1324,18 @@
                     }
                 }
                 
-                btn.textContent = '✓ ' + t('permissions.sensors.granted', 'Sensor Access Granted');
+                btn.textContent = '✓ تم منح صلاحية الاستشعار';
                 btn.classList.add('success');
                 satApp.orientationPermission = true;
                 
                 startStep.style.display = 'block';
                 
             } catch (error) {
-                btn.textContent = '✗ ' + t('permissions.sensors.failed', 'Sensor Access Failed');
+                btn.textContent = '✗ فشل منح صلاحية الاستشعار';
                 btn.style.background = 'var(--danger-color)';
                 
                 setTimeout(() => {
-                    btn.textContent = t('permissions.sensors.retry', 'Retry Sensor Access');
+                    btn.textContent = 'إعادة المحاولة';
                     btn.style.background = 'var(--accent-color)';
                     btn.disabled = false;
                 }, 3000);
@@ -1287,26 +1347,27 @@
             const loadingDetails = document.getElementById('loadingDetails');
             
             try {
-                loadingDetails.textContent = t('loading.magnetic', 'Calculating magnetic declination...');
+                loadingDetails.textContent = 'حساب الانحراف المغناطيسي...';
                 await satApp.calculateMagneticDeclination();
                 
-                loadingDetails.textContent = t('loading.camera', 'Initializing camera...');
+                loadingDetails.textContent = 'تهيئة الكاميرا...';
                 await satApp.getUserMedia();
                 
-                loadingDetails.textContent = t('loading.sensors', 'Initializing sensors...');
+                loadingDetails.textContent = 'تهيئة أجهزة الاستشعار...';
                 await satApp.setupSensors();
                 
-                loadingDetails.textContent = t('loading.interface', 'Loading interface...');
+                loadingDetails.textContent = 'تحميل الواجهة...';
                 satApp.setupEventListeners();
+                satApp.populateSatelliteList();
                 
-                loadingDetails.textContent = t('loading.complete', 'Complete!');
+                loadingDetails.textContent = 'مكتمل!';
                 setTimeout(() => {
                     loadingScreen.style.display = 'none';
                     satApp.startUpdates();
                 }, 500);
                 
             } catch (error) {
-                satApp.showError('Initialization Error', error.message);
+                satApp.showError('خطأ في التهيئة', error.message);
             }
         }
 
@@ -1330,15 +1391,6 @@
                     element.textContent = translation;
                 }
             });
-
-            // Update option group labels
-            document.querySelectorAll('optgroup[data-key]').forEach(group => {
-                const key = group.getAttribute('data-key');
-                const translation = t(key);
-                if (translation) {
-                    group.label = translation;
-                }
-            });
         }
 
         function switchLanguage(lang) {
@@ -1358,33 +1410,63 @@
             // Update all translations
             updateTranslations();
             
+            // Re-populate satellite list
+            if (satApp?.satellites) {
+                satApp.populateSatelliteList();
+            }
+            
             // Update satellite info if visible
             if (satApp?.selectedSatellite) {
                 satApp.updateSatelliteInfo();
             }
         }
 
-        // Professional Interface Controls
+        // Enhanced Interface Controls
         function togglePanels() {
             panelsCollapsed = !panelsCollapsed;
             const topPanel = document.getElementById('topPanel');
             const alignmentPanel = document.getElementById('alignmentPanel');
             const coordDisplay = document.getElementById('coordinatesDisplay');
-            const toggleBtn = document.getElementById('togglePanels');
+            const compassContainer = document.getElementById('compassContainer');
+            const satelliteInfo = document.getElementById('satelliteInfo');
+            const toggleShowBtn = document.getElementById('toggleShowBtn');
             
             if (panelsCollapsed) {
                 topPanel.classList.add('collapsed');
                 alignmentPanel.classList.add('collapsed');
                 coordDisplay.classList.add('collapsed');
-                toggleBtn.innerHTML = '<span>▲</span>';
-                toggleBtn.title = 'Show Interface';
+                compassContainer.style.opacity = '0.3';
+                satelliteInfo.style.opacity = '0.3';
+                toggleShowBtn.classList.add('visible');
             } else {
                 topPanel.classList.remove('collapsed');
                 alignmentPanel.classList.remove('collapsed');
                 coordDisplay.classList.remove('collapsed');
-                toggleBtn.innerHTML = '<span>▼</span>';
-                toggleBtn.title = 'Hide Interface';
+                compassContainer.style.opacity = '1';
+                satelliteInfo.style.opacity = '1';
+                toggleShowBtn.classList.remove('visible');
             }
+        }
+
+        function showPanels() {
+            panelsCollapsed = false;
+            const topPanel = document.getElementById('topPanel');
+            const alignmentPanel = document.getElementById('alignmentPanel');
+            const coordDisplay = document.getElementById('coordinatesDisplay');
+            const compassContainer = document.getElementById('compassContainer');
+            const satelliteInfo = document.getElementById('satelliteInfo');
+            const toggleShowBtn = document.getElementById('toggleShowBtn');
+            
+            topPanel.classList.remove('collapsed');
+            alignmentPanel.classList.remove('collapsed');
+            coordDisplay.classList.remove('collapsed');
+            compassContainer.style.opacity = '1';
+            satelliteInfo.style.opacity = '1';
+            toggleShowBtn.classList.remove('visible');
+            
+            // Update toggle button state
+            const toggleBtn = document.getElementById('togglePanels');
+            toggleBtn.innerHTML = '<span>▼</span>';
         }
 
         // Professional Satellite Application Class
@@ -1691,9 +1773,79 @@
                 this.updateInterval = null;
             }
 
+            // Enhanced satellite list population
+            populateSatelliteList() {
+                const select = this.satelliteSelect;
+                select.innerHTML = '';
+                
+                // Add placeholder option
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = t('interface.satellite.placeholder', '-- اختر القمر الصناعي --');
+                select.appendChild(placeholder);
+
+                // Group satellites
+                const groups = {
+                    arab: [],
+                    european: [],
+                    other: []
+                };
+
+                for (const [key, satellite] of Object.entries(this.satellites)) {
+                    const item = { key, satellite };
+                    
+                    if (['nilesat-201', 'nilesat-301', 'arabsat-5a', 'arabsat-5c', 'badr-4', 'badr-5', 'badr-6', 'badr-7', 'badr-8'].includes(key)) {
+                        groups.arab.push(item);
+                    } else if (['hotbird-13f', 'hotbird-13g', 'astra-1kr', 'astra-1l', 'astra-1m', 'astra-1n', 'eutelsat-16a', 'eutelsat-7c'].includes(key)) {
+                        groups.european.push(item);
+                    } else {
+                        groups.other.push(item);
+                    }
+                }
+
+                // Add Arab satellites group
+                if (groups.arab.length > 0) {
+                    const arabGroup = document.createElement('optgroup');
+                    arabGroup.label = t('satellites.arab', 'الأقمار العربية');
+                    groups.arab.forEach(({ key, satellite }) => {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        option.textContent = `${satellite.name[currentLanguage] || satellite.name.en} (${satellite.longitude}°${satellite.longitude >= 0 ? 'E' : 'W'})`;
+                        arabGroup.appendChild(option);
+                    });
+                    select.appendChild(arabGroup);
+                }
+
+                // Add European satellites group
+                if (groups.european.length > 0) {
+                    const europeanGroup = document.createElement('optgroup');
+                    europeanGroup.label = t('satellites.european', 'الأقمار الأوروبية');
+                    groups.european.forEach(({ key, satellite }) => {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        option.textContent = `${satellite.name[currentLanguage] || satellite.name.en} (${satellite.longitude}°${satellite.longitude >= 0 ? 'E' : 'W'})`;
+                        europeanGroup.appendChild(option);
+                    });
+                    select.appendChild(europeanGroup);
+                }
+
+                // Add other satellites group
+                if (groups.other.length > 0) {
+                    const otherGroup = document.createElement('optgroup');
+                    otherGroup.label = t('satellites.other', 'أقمار أخرى');
+                    groups.other.forEach(({ key, satellite }) => {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        option.textContent = `${satellite.name[currentLanguage] || satellite.name.en} (${satellite.longitude}°${satellite.longitude >= 0 ? 'E' : 'W'})`;
+                        otherGroup.appendChild(option);
+                    });
+                    select.appendChild(otherGroup);
+                }
+            }
+
             async startInitialization() {
                 try {
-                    this.updateLoadingText(t('loading.permissions', 'Checking permissions...'));
+                    this.updateLoadingText('فحص الصلاحيات...');
                     await this.checkPermissions();
                     
                     if (this.cameraPermission && this.locationPermission && this.orientationPermission) {
@@ -1701,25 +1853,26 @@
                     }
                     
                 } catch (error) {
-                    this.showError('Initialization Error', error.message);
+                    this.showError('خطأ في التهيئة', error.message);
                 }
             }
 
             async continueSetup() {
-                this.updateLoadingText(t('loading.magnetic', 'Calculating magnetic declination...'));
+                this.updateLoadingText('حساب الانحراف المغناطيسي...');
                 await this.calculateMagneticDeclination();
                 
-                this.updateLoadingText(t('loading.camera', 'Initializing camera...'));
+                this.updateLoadingText('تهيئة الكاميرا...');
                 await this.setupCamera();
                 
-                this.updateLoadingText(t('loading.sensors', 'Initializing sensors...'));
+                this.updateLoadingText('تهيئة أجهزة الاستشعار...');
                 await this.setupSensors();
                 
-                this.updateLoadingText(t('loading.interface', 'Loading interface...'));
+                this.updateLoadingText('تحميل الواجهة...');
                 this.setupEventListeners();
                 this.generateCompassMarkings();
+                this.populateSatelliteList();
                 
-                this.updateLoadingText(t('loading.complete', 'Complete!'));
+                this.updateLoadingText('مكتمل!');
                 setTimeout(() => {
                     this.loadingScreen.style.display = 'none';
                     this.startUpdates();
@@ -1733,7 +1886,7 @@
             async checkPermissions() {
                 if (this.isIOS()) {
                     this.permissionButtons.style.display = 'block';
-                    this.updateLoadingText(t('loading.grant', 'Please grant required permissions to run the application'));
+                    this.updateLoadingText('يرجى منح الصلاحيات المطلوبة لتشغيل التطبيق');
                     return;
                 }
 
@@ -1741,7 +1894,7 @@
                     await this.requestAllPermissions();
                 } catch (error) {
                     this.permissionButtons.style.display = 'block';
-                    this.updateLoadingText(t('loading.grant', 'Please grant required permissions'));
+                    this.updateLoadingText('يرجى منح الصلاحيات المطلوبة');
                 }
             }
 
@@ -1763,7 +1916,7 @@
             async getUserLocation() {
                 return new Promise((resolve, reject) => {
                     if (!navigator.geolocation) {
-                        reject(new Error('Geolocation service not available'));
+                        reject(new Error('خدمة تحديد الموقع غير متوفرة'));
                         return;
                     }
 
@@ -1781,16 +1934,16 @@
                             resolve();
                         },
                         (error) => {
-                            let message = 'Failed to determine location';
+                            let message = 'فشل في تحديد الموقع';
                             switch(error.code) {
                                 case error.PERMISSION_DENIED:
-                                    message = 'Location permission denied';
+                                    message = 'تم رفض صلاحية الموقع';
                                     break;
                                 case error.POSITION_UNAVAILABLE:
-                                    message = 'Location unavailable';
+                                    message = 'الموقع غير متوفر';
                                     break;
                                 case error.TIMEOUT:
-                                    message = 'Location timeout';
+                                    message = 'انتهت مهلة تحديد الموقع';
                                     break;
                             }
                             reject(new Error(message));
@@ -1842,7 +1995,7 @@
 
             async setupCamera() {
                 if (!this.cameraPermission) {
-                    throw new Error('Camera permission not granted');
+                    throw new Error('لم يتم منح صلاحية الكاميرا');
                 }
 
                 return this.getUserMedia();
@@ -1868,13 +2021,13 @@
                         };
                     });
                 } catch (error) {
-                    throw new Error('Failed to start camera: ' + error.message);
+                    throw new Error('فشل في تشغيل الكاميرا: ' + error.message);
                 }
             }
 
             async setupSensors() {
                 if (!this.orientationPermission) {
-                    throw new Error('No permission for sensors');
+                    throw new Error('لا توجد صلاحية لأجهزة الاستشعار');
                 }
 
                 window.addEventListener('deviceorientation', (event) => {
@@ -1973,12 +2126,12 @@
                 
                 document.getElementById('satName').textContent = satName;
                 document.getElementById('satDetails').innerHTML = `
-                    <strong>${t('coordinates.longitude', 'Longitude')}:</strong> ${satellite.longitude}°<br>
-                    <strong>${t('satellites.description', 'Description')}:</strong> ${satDesc}<br>
-                    <strong>${t('satellites.coverage', 'Coverage')}:</strong> ${satFootprint}<br>
-                    <strong>${t('satellites.operator', 'Operator')}:</strong> ${satOperator}<br>
-                    <strong>${t('satellites.power', 'Power')}:</strong> ${satellite.power}<br>
-                    <strong>${t('satellites.frequencies', 'Sample Frequencies')}:</strong><br>
+                    <strong>خط الطول:</strong> ${satellite.longitude}°<br>
+                    <strong>الوصف:</strong> ${satDesc}<br>
+                    <strong>التغطية:</strong> ${satFootprint}<br>
+                    <strong>المشغل:</strong> ${satOperator}<br>
+                    <strong>القدرة:</strong> ${satellite.power}<br>
+                    <strong>ترددات عينة:</strong><br>
                     ${satellite.frequencies.slice(0, 3).join('<br>')}
                 `;
                 this.satelliteInfo.classList.add('visible');
@@ -2034,8 +2187,8 @@
             updateDisplay() {
                 if (!this.selectedSatellite || !this.userLat) {
                     this.updateAlignmentStatus(
-                        t('status.searching', 'Searching for Satellite'),
-                        t('status.instructions', 'Select a satellite from above to begin'), 
+                        t('status.searching', 'البحث عن القمر الصناعي'),
+                        t('status.instructions', 'اختر قمر صناعي من الأعلى للبدء'), 
                         0
                     );
                     return;
@@ -2046,8 +2199,8 @@
 
                 if (!position || !position.valid) {
                     this.updateAlignmentStatus(
-                        t('status.invisible', 'Satellite Not Visible'),
-                        t('status.below_horizon', 'Satellite is below horizon from your location'), 
+                        'القمر الصناعي غير مرئي',
+                        'القمر الصناعي تحت الأفق من موقعك', 
                         0
                     );
                     return;
@@ -2083,12 +2236,12 @@
             }
 
             getAlignmentStatusText(accuracy) {
-                if (accuracy >= 95) return t('status.perfect', 'Perfect Alignment Achieved');
-                if (accuracy >= 85) return t('status.excellent', 'Excellent Alignment');
-                if (accuracy >= 70) return t('status.good', 'Good Alignment');
-                if (accuracy >= 50) return t('status.fair', 'Fair Alignment');
-                if (accuracy >= 30) return t('status.poor', 'Poor Alignment');
-                return t('status.none', 'No Alignment');
+                if (accuracy >= 95) return t('status.perfect', 'توجيه مثالي محقق');
+                if (accuracy >= 85) return t('status.excellent', 'توجيه ممتاز');
+                if (accuracy >= 70) return t('status.good', 'توجيه جيد');
+                if (accuracy >= 50) return t('status.fair', 'توجيه متوسط');
+                if (accuracy >= 30) return t('status.poor', 'توجيه ضعيف');
+                return t('status.none', 'لا يوجد توجيه');
             }
 
             getAlignmentDetails(angleDiff, tiltDiff, position) {
@@ -2096,23 +2249,23 @@
                 
                 if (angleDiff > 2) {
                     const direction = this.deviceHeading < position.azimuth ? 
-                        t('alignment.turnRight', 'Turn right') : 
-                        t('alignment.turnLeft', 'Turn left');
+                        t('alignment.turnRight', 'استدر يميناً') : 
+                        t('alignment.turnLeft', 'استدر يساراً');
                     details.push(`${direction} ${Math.round(angleDiff)}°`);
                 }
                 
                 if (tiltDiff > 1) {
                     const direction = this.deviceTilt < position.elevation ? 
-                        t('alignment.tiltUp', 'Tilt up') : 
-                        t('alignment.tiltDown', 'Tilt down');
+                        t('alignment.tiltUp', 'اتجه للأعلى') : 
+                        t('alignment.tiltDown', 'اتجه للأسفل');
                     details.push(`${direction} ${Math.round(tiltDiff)}°`);
                 }
                 
                 if (details.length === 0) {
-                    details.push(t('alignment.perfect', 'Dish is perfectly aligned with satellite'));
+                    details.push(t('alignment.perfect', 'الطبق موجه بشكل مثالي نحو القمر الصناعي'));
                 }
                 
-                details.push(`${t('alignment.distance', 'Distance')}: ${position.distance} km`);
+                details.push(`${t('alignment.distance', 'المسافة')}: ${position.distance} km`);
                 
                 return details.join(' • ');
             }
@@ -2125,7 +2278,7 @@
                 const signalText = document.getElementById('signalText');
                 
                 signalBar.style.width = accuracy + '%';
-                signalText.textContent = `${t('status.precision', 'Alignment Precision')}: ${Math.round(accuracy)}%`;
+                signalText.textContent = `${t('status.precision', 'دقة التوجيه')}: ${Math.round(accuracy)}%`;
             }
 
             drawProfessionalSatelliteMarker(position, angleDiff, elevationAccuracy) {
@@ -2220,290 +2373,6 @@
             }
         }
 
-        // Professional Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            let swRegistration = null;
-            let isUpdateAvailable = false;
-
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('sw.js')
-                    .then(function(registration) {
-                        console.log('Service Worker registered successfully');
-                        swRegistration = registration;
-
-                        // Check for updates
-                        registration.addEventListener('updatefound', () => {
-                            console.log('Service Worker update available');
-                            const newWorker = registration.installing;
-                            
-                            newWorker.addEventListener('statechange', () => {
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    isUpdateAvailable = true;
-                                    showUpdateNotification();
-                                }
-                            });
-                        });
-
-                        // Check for updates periodically
-                        setInterval(() => {
-                            registration.update();
-                        }, 5 * 60 * 1000);
-                        
-                    })
-                    .catch(function(registrationError) {
-                        console.log('Service Worker registration failed:', registrationError);
-                    });
-
-                // Listen for Service Worker messages
-                navigator.serviceWorker.addEventListener('message', event => {
-                    if (event.data && event.data.type === 'SW_UPDATED') {
-                        console.log('Service Worker updated:', event.data.message);
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 3000);
-                    }
-                });
-
-                // Check for updates when app regains focus
-                document.addEventListener('visibilitychange', () => {
-                    if (!document.hidden && swRegistration) {
-                        swRegistration.update();
-                    }
-                });
-            });
-
-            // Professional update notification system
-            function showUpdateNotification() {
-                const updateBanner = document.createElement('div');
-                updateBanner.id = 'update-banner';
-                updateBanner.innerHTML = `
-                    <div style="
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        background: linear-gradient(135deg, var(--accent-color), #4a90e2);
-                        color: white;
-                        padding: 16px 20px;
-                        text-align: center;
-                        z-index: 1000;
-                        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-                        backdrop-filter: blur(20px);
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        font-family: inherit;
-                        font-size: 14px;
-                        animation: slideDown 0.3s ease-out;
-                    ">
-                        <div style="display: flex; align-items: center;">
-                            <div style="
-                                width: 8px;
-                                height: 8px;
-                                background: #30d158;
-                                border-radius: 50%;
-                                margin-right: 12px;
-                                animation: pulse 2s infinite;
-                            "></div>
-                            <div>
-                                <strong>${t('update.available', 'Update Available')}</strong><br>
-                                <span style="opacity: 0.9; font-size: 12px;">
-                                    ${t('update.description', 'Enhanced version of SatAlign Pro is ready')}
-                                </span>
-                            </div>
-                        </div>
-                        <div>
-                            <button onclick="applyUpdate()" style="
-                                background: white;
-                                color: var(--accent-color);
-                                border: none;
-                                padding: 8px 16px;
-                                border-radius: 6px;
-                                font-weight: 600;
-                                cursor: pointer;
-                                margin-left: 8px;
-                                transition: all 0.2s;
-                                font-size: 12px;
-                            " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                                ${t('update.now', 'Update Now')}
-                            </button>
-                            <button onclick="dismissUpdate()" style="
-                                background: rgba(255,255,255,0.1);
-                                color: white;
-                                border: 1px solid rgba(255,255,255,0.2);
-                                padding: 8px 16px;
-                                border-radius: 6px;
-                                cursor: pointer;
-                                transition: all 0.2s;
-                                font-size: 12px;
-                            " onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
-                                ${t('update.later', 'Later')}
-                            </button>
-                        </div>
-                    </div>
-                `;
-
-                // Add animation styles
-                const style = document.createElement('style');
-                style.textContent = `
-                    @keyframes slideDown {
-                        from { transform: translateY(-100%); opacity: 0; }
-                        to { transform: translateY(0); opacity: 1; }
-                    }
-                    @keyframes slideUp {
-                        from { transform: translateY(0); opacity: 1; }
-                        to { transform: translateY(-100%); opacity: 0; }
-                    }
-                    .update-banner-exit {
-                        animation: slideUp 0.3s ease-out forwards;
-                    }
-                `;
-                document.head.appendChild(style);
-                document.body.appendChild(updateBanner);
-
-                // Auto-dismiss after 10 seconds
-                setTimeout(() => {
-                    dismissUpdate();
-                }, 10000);
-            }
-
-            // Apply update function
-            window.applyUpdate = function() {
-                if (swRegistration && swRegistration.waiting) {
-                    swRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
-                    
-                    showUpdateProgress();
-                    
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 2000);
-                }
-            }
-
-            // Dismiss update function
-            window.dismissUpdate = function() {
-                const banner = document.getElementById('update-banner');
-                if (banner) {
-                    banner.classList.add('update-banner-exit');
-                    setTimeout(() => {
-                        banner.remove();
-                    }, 300);
-                }
-            }
-
-            // Show update progress
-            function showUpdateProgress() {
-                const banner = document.getElementById('update-banner');
-                if (banner) {
-                    banner.innerHTML = `
-                        <div style="
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            width: 100%;
-                            color: white;
-                        ">
-                            <div style="
-                                width: 20px;
-                                height: 20px;
-                                border: 2px solid rgba(255,255,255,0.3);
-                                border-top: 2px solid white;
-                                border-radius: 50%;
-                                animation: spin 1s linear infinite;
-                                margin-right: 12px;
-                            "></div>
-                            <span><strong>${t('update.installing', 'Installing Update...')}</strong> ${t('update.wait', 'Please wait')}</span>
-                        </div>
-                    `;
-                    
-                    const spinStyle = document.createElement('style');
-                    spinStyle.textContent = `
-                        @keyframes spin {
-                            0% { transform: rotate(0deg); }
-                            100% { transform: rotate(360deg); }
-                        }
-                    `;
-                    document.head.appendChild(spinStyle);
-                }
-            }
-        }
-
-        // Professional PWA Installation
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            
-            // Show install prompt for new users after 30 seconds
-            setTimeout(() => {
-                showInstallPrompt();
-            }, 30000);
-        });
-
-        function showInstallPrompt() {
-            if (!deferredPrompt) return;
-            
-            const installBanner = document.createElement('div');
-            installBanner.innerHTML = `
-                <div style="
-                    position: fixed;
-                    bottom: 20px;
-                    left: 20px;
-                    right: 20px;
-                    background: var(--glass-bg);
-                    backdrop-filter: blur(40px);
-                    color: white;
-                    padding: 20px;
-                    border-radius: 16px;
-                    text-align: center;
-                    z-index: 999;
-                    border: 1px solid var(--glass-border);
-                    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-                ">
-                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">
-                        ${t('install.title', 'Install Application')}
-                    </div>
-                    <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
-                        ${t('install.description', 'For quick access and better experience')}
-                    </div>
-                    <div>
-                        <button onclick="installApp()" style="
-                            background: var(--accent-color);
-                            color: white;
-                            border: none;
-                            padding: 10px 20px;
-                            border-radius: 8px;
-                            margin: 5px;
-                            cursor: pointer;
-                            font-weight: 500;
-                        ">${t('install.install', 'Install')}</button>
-                        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="
-                            background: transparent;
-                            color: var(--text-secondary);
-                            border: 1px solid var(--border-color);
-                            padding: 10px 20px;
-                            border-radius: 8px;
-                            margin: 5px;
-                            cursor: pointer;
-                        ">${t('install.no_thanks', 'No Thanks')}</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(installBanner);
-        }
-
-        function installApp() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                    }
-                    deferredPrompt = null;
-                });
-            }
-        }
-
         // Initialize application
         document.addEventListener('DOMContentLoaded', () => {
             // Set initial language
@@ -2518,9 +2387,9 @@
         if ('wakeLock' in navigator) {
             navigator.wakeLock.request('screen').then((lock) => {
                 wakeLock = lock;
-                console.log('Screen wake lock acquired');
+                console.log('تم تفعيل منع قفل الشاشة');
             }).catch(err => {
-                console.log('Wake lock failed:', err);
+                console.log('فشل في منع قفل الشاشة:', err);
             });
         }
 
@@ -2537,17 +2406,14 @@
         // Handle visibility changes for battery optimization
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) {
-                console.log('App regained focus - checking for updates');
-                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-                    navigator.serviceWorker.controller.postMessage({ type: 'CHECK_UPDATE' });
-                }
+                console.log('التطبيق نشط مرة أخرى');
                 
                 // Re-acquire wake lock if needed
                 if ('wakeLock' in navigator && !wakeLock) {
                     navigator.wakeLock.request('screen').then((lock) => {
                         wakeLock = lock;
                     }).catch(err => {
-                        console.log('Wake lock re-acquisition failed:', err);
+                        console.log('فشل في إعادة تفعيل منع قفل الشاشة:', err);
                     });
                 }
             } else {
@@ -2561,18 +2427,18 @@
 
         // Professional error handling
         window.addEventListener('error', (event) => {
-            console.error('Global error:', event.error);
+            console.error('خطأ عام:', event.error);
             if (satApp) {
-                satApp.showError('Application Error', 'An unexpected error occurred. Please refresh the page.');
+                satApp.showError('خطأ في التطبيق', 'حدث خطأ غير متوقع. يرجى إعادة تحميل الصفحة.');
             }
         });
 
         // Handle unhandled promise rejections
         window.addEventListener('unhandledrejection', (event) => {
-            console.error('Unhandled promise rejection:', event.reason);
+            console.error('رفض غير معالج للوعد:', event.reason);
             event.preventDefault();
             if (satApp) {
-                satApp.showError('System Error', 'A system error occurred. Please try again.');
+                satApp.showError('خطأ في النظام', 'حدث خطأ في النظام. يرجى المحاولة مرة أخرى.');
             }
         });
 
@@ -2580,7 +2446,7 @@
         if ('performance' in window) {
             window.addEventListener('load', () => {
                 const perfData = performance.getEntriesByType('navigation')[0];
-                console.log('App performance metrics:', {
+                console.log('مقاييس أداء التطبيق:', {
                     loadTime: perfData.loadEventEnd - perfData.loadEventStart,
                     domContentLoaded: perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart,
                     totalTime: perfData.loadEventEnd - perfData.fetchStart
@@ -2594,10 +2460,10 @@
 ║        SatAlign Pro Enterprise        ║
 ║     Professional Satellite Finder    ║
 ║                                       ║
-║    🛰️  Built with precision and care   ║
-║    🎯  Enterprise-grade performance    ║
-║    🌍  Multi-language support         ║
-║    📱  Professional PWA architecture   ║
+║    🛰️  مبني بدقة واهتمام             ║
+║    🎯  أداء على مستوى المؤسسات        ║
+║    🌍  دعم متعدد اللغات               ║
+║    📱  هيكلة PWA احترافية             ║
 ║                                       ║
 ║         © 2024 SatAlign Pro           ║
 ╚═══════════════════════════════════════╝`, 
@@ -2606,5 +2472,4 @@
     </script>
 </body>
 </html>
-
                     
