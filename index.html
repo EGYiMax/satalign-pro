@@ -98,7 +98,100 @@
             height: 100vh;
             object-fit: cover;
             filter: brightness(0.7) contrast(1.1);
-            transform: scaleX(-1); /* Mirror for selfie camera effect */
+        }
+
+        /* Sky Targeting Guide */
+        .sky-guide {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--warning-color);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            z-index: 15;
+            box-shadow: 0 10px 40px rgba(255,193,7,0.3);
+            animation: guideGlow 2s infinite ease-in-out;
+            max-width: 300px;
+        }
+
+        .sky-guide.hidden {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.8);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .guide-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .guide-icon {
+            font-size: 48px;
+            animation: phoneRotate 3s infinite ease-in-out;
+        }
+
+        .guide-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .guide-arrow {
+            font-size: 32px;
+            color: var(--warning-color);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes guideGlow {
+            0%, 100% { border-color: var(--warning-color); box-shadow: 0 10px 40px rgba(255,193,7,0.3); }
+            50% { border-color: var(--accent-color); box-shadow: 0 10px 40px rgba(0,102,204,0.4); }
+        }
+
+        @keyframes phoneRotate {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* Device Orientation Indicator */
+        .orientation-indicator {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 10px 20px;
+            border: 1px solid var(--glass-border);
+            z-index: 25;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .orientation-indicator.correct {
+            border-color: var(--success-color);
+            color: var(--success-color);
+        }
+
+        .orientation-indicator.incorrect {
+            border-color: var(--warning-color);
+            color: var(--warning-color);
         }
 
         /* AR Overlay */
@@ -1258,6 +1351,9 @@
     
     <!-- AR Overlay -->
     <div class="ar-overlay">
+        <div class="orientation-indicator" id="orientationIndicator">
+            <span data-key="orientation.checking">Checking device orientation...</span>
+        </div>
         <div class="crosshair">
             <div class="crosshair-circle">
                 <div class="crosshair-lines">
@@ -1427,7 +1523,7 @@
                 permissions: {
                     camera: {
                         title: "Camera Access Required",
-                        description: "We need camera access to display the real sky view and provide AR guidance",
+                        description: "We need camera access to show the real sky view and provide AR guidance when pointing toward satellites",
                         button: "Grant Camera Access"
                     },
                     location: {
@@ -1437,7 +1533,7 @@
                     },
                     sensors: {
                         title: "Device Sensors Required",
-                        description: "We need compass and orientation sensors to detect device direction",
+                        description: "We need compass and orientation sensors to detect when you point your device toward the sky and satellite",
                         button: "Grant Sensor Access"
                     },
                     complete: {
@@ -1503,6 +1599,17 @@
                     permissionDenied: "Permission denied",
                     networkError: "Network error",
                     unknown: "An unknown error occurred"
+                },
+                guide: {
+                    pointToSky: "Point your device toward the sky where the satellite is located",
+                    holdSteady: "Hold device steady and point toward satellite"
+                },
+                orientation: {
+                    checking: "Checking device orientation...",
+                    correct: "✓ Perfect orientation - pointing toward sky",
+                    tiltUp: "⬆️ Tilt device up toward the sky",
+                    tiltDown: "⬇️ Lower device slightly",
+                    tiltMore: "📱 Tilt device more toward the sky"
                 }
             },
             ar: {
@@ -1513,7 +1620,7 @@
                 permissions: {
                     camera: {
                         title: "صلاحية الكاميرا مطلوبة",
-                        description: "نحتاج للكاميرا لعرض الاتجاه الحقيقي للسماء وتوفير الإرشاد المعزز",
+                        description: "نحتاج للكاميرا لعرض السماء الحقيقية وتوفير الإرشاد المعزز عند توجيه الجهاز نحو الأقمار الصناعية",
                         button: "منح صلاحية الكاميرا"
                     },
                     location: {
@@ -1523,7 +1630,7 @@
                     },
                     sensors: {
                         title: "صلاحية أجهزة الاستشعار مطلوبة",
-                        description: "نحتاج البوصلة ومقياس الإمالة لتحديد اتجاه الجهاز",
+                        description: "نحتاج البوصلة ومقياس الإمالة لتحديد عندما توجه جهازك نحو السماء والقمر الصناعي",
                         button: "منح صلاحية الاستشعار"
                     },
                     complete: {
@@ -1589,6 +1696,17 @@
                     permissionDenied: "تم رفض الصلاحية",
                     networkError: "خطأ في الشبكة",
                     unknown: "حدث خطأ غير معروف"
+                },
+                guide: {
+                    pointToSky: "وجه جهازك نحو السماء حيث يقع القمر الصناعي",
+                    holdSteady: "امسك الجهاز بثبات ووجهه نحو القمر الصناعي"
+                },
+                orientation: {
+                    checking: "فحص اتجاه الجهاز...",
+                    correct: "✓ اتجاه مثالي - موجه نحو السماء",
+                    tiltUp: "⬆️ ارفع الجهاز نحو السماء",
+                    tiltDown: "⬇️ اخفض الجهاز قليلاً",
+                    tiltMore: "📱 وجه الجهاز أكثر نحو السماء"
                 }
             }
         };
@@ -1856,6 +1974,7 @@
                     heading: 0,
                     tilt: 0,
                     roll: 0,
+                    skyAngle: 0, // Angle pointing toward sky (0° = horizon, 90° = zenith)
                     calibrationOffset: 0,
                     isCalibrated: false
                 };
@@ -1896,6 +2015,8 @@
                     loadingDetails: document.getElementById('loadingDetails'),
                     permissionButtons: document.getElementById('permissionButtons'),
                     video: document.getElementById('video'),
+                    skyGuide: document.getElementById('skyGuide'),
+                    orientationIndicator: document.getElementById('orientationIndicator'),
                     satelliteSelect: document.getElementById('satelliteSelect'),
                     satelliteMarkers: document.getElementById('satelliteMarkers'),
                     satelliteInfo: document.getElementById('satelliteInfo'),
@@ -1911,6 +2032,9 @@
                 
                 // Populate satellite selector
                 this.populateSatelliteSelector();
+                
+                // Initialize sky guide
+                this.showSkyGuide();
             }
 
             setupEventListeners() {
@@ -2110,7 +2234,7 @@
 
             handleDeviceOrientation(event) {
                 if (event.alpha !== null) {
-                    // Fix for Android: Convert compass heading correctly
+                    // Compass heading (azimuth)
                     let heading = event.alpha;
                     
                     // Apply magnetic declination correction
@@ -2125,14 +2249,22 @@
                 }
                 
                 if (event.beta !== null) {
+                    // Device tilt (elevation angle when pointing toward sky)
+                    // Beta ranges from -180 to 180
+                    // When pointing toward sky: positive values mean pointing up
                     this.deviceData.tilt = event.beta;
+                    
+                    // Calculate sky-pointing angle (0° = horizon, 90° = zenith)
+                    this.deviceData.skyAngle = Math.max(0, Math.min(90, 90 - Math.abs(event.beta)));
                 }
                 
                 if (event.gamma !== null) {
                     this.deviceData.roll = event.gamma;
                 }
                 
+                // Update displays
                 this.updateSensorDisplay();
+                this.updateOrientationGuide();
             }
 
             startCalibration() {
@@ -2211,16 +2343,59 @@
                 });
             }
 
-            generateCompassMarkings() {
-                const container = document.getElementById('compassMarkings');
-                container.innerHTML = '';
-                
-                for (let i = 0; i < 360; i += 15) {
-                    const mark = document.createElement('div');
-                    mark.className = i % 45 === 0 ? 'compass-mark major' : 'compass-mark';
-                    mark.style.transform = `translateX(-50%) rotate(${i}deg)`;
-                    container.appendChild(mark);
+            // Sky Guide Management
+            showSkyGuide() {
+                if (this.elements.skyGuide) {
+                    this.elements.skyGuide.classList.remove('hidden');
+                    
+                    // Auto-hide after satellite is selected and device is properly oriented
+                    this.checkGuideVisibility();
                 }
+            }
+
+            hideSkyGuide() {
+                if (this.elements.skyGuide) {
+                    this.elements.skyGuide.classList.add('hidden');
+                }
+            }
+
+            checkGuideVisibility() {
+                // Hide guide when satellite is selected and device is pointing toward sky
+                if (this.selectedSatellite && this.isPointingTowardSky()) {
+                    setTimeout(() => {
+                        this.hideSkyGuide();
+                    }, 2000); // Keep visible for 2 seconds after correct positioning
+                }
+            }
+
+            isPointingTowardSky() {
+                // Check if device is tilted up toward sky (beta should be positive when pointing up)
+                // Good sky pointing: beta between 30° to 90° (pointing upward)
+                return this.deviceData.tilt > 30 && this.deviceData.tilt <= 90;
+            }
+
+            updateOrientationGuide() {
+                if (!this.elements.orientationIndicator) return;
+
+                const indicator = this.elements.orientationIndicator;
+                const isPointingUp = this.isPointingTowardSky();
+                
+                if (isPointingUp) {
+                    indicator.className = 'orientation-indicator correct';
+                    indicator.innerHTML = `<span>${this.t('orientation.correct', '✓ Perfect orientation - pointing toward sky')}</span>`;
+                } else if (this.deviceData.tilt <= 30) {
+                    indicator.className = 'orientation-indicator incorrect';
+                    indicator.innerHTML = `<span>${this.t('orientation.tiltUp', '⬆️ Tilt device up toward the sky')}</span>`;
+                } else if (this.deviceData.tilt > 90) {
+                    indicator.className = 'orientation-indicator incorrect';
+                    indicator.innerHTML = `<span>${this.t('orientation.tiltDown', '⬇️ Lower device slightly')}</span>`;
+                } else {
+                    indicator.className = 'orientation-indicator incorrect';
+                    indicator.innerHTML = `<span>${this.t('orientation.tiltMore', '📱 Tilt device more toward the sky')}</span>`;
+                }
+
+                // Update guide visibility
+                this.checkGuideVisibility();
             }
 
             // Satellite Calculations
@@ -2297,21 +2472,25 @@
                 document.getElementById('skew').innerHTML = `${position.skew.toFixed(1)}<span class="metric-unit">°</span>`;
                 document.getElementById('coordDistance').textContent = position.distance + ' km';
 
-                // Calculate alignment precision with corrected directions
+                // Calculate alignment precision with sky-pointing corrections
                 const headingDiff = this.calculateAngleDifference(this.deviceData.heading, position.azimuth);
-                const tiltDiff = Math.abs(this.deviceData.tilt - position.elevation);
+                
+                // For elevation, compare satellite elevation with device sky angle
+                const elevationDiff = Math.abs((this.deviceData.skyAngle || 0) - position.elevation);
                 
                 const azimuthAccuracy = Math.max(0, 100 - (headingDiff * 2));
-                const elevationAccuracy = Math.max(0, 100 - (tiltDiff * 4));
-                const overallAccuracy = (azimuthAccuracy + elevationAccuracy) / 2;
+                const elevationAccuracy = Math.max(0, 100 - (elevationDiff * 4));
+                const orientationBonus = this.isPointingTowardSky() ? 1.1 : 0.8; // Bonus for correct sky orientation
+                
+                const overallAccuracy = (azimuthAccuracy + elevationAccuracy) / 2 * orientationBonus;
 
                 this.updateAlignmentStatus(
                     this.getAlignmentStatusText(overallAccuracy),
-                    this.getAlignmentDetails(headingDiff, tiltDiff, position),
-                    overallAccuracy
+                    this.getAlignmentDetails(headingDiff, elevationDiff, position),
+                    Math.min(100, overallAccuracy)
                 );
 
-                // Draw satellite marker
+                // Draw satellite marker with sky-pointing corrections
                 this.drawSatelliteMarker(position, headingDiff, elevationAccuracy);
             }
 
@@ -2329,10 +2508,16 @@
                 return this.t('status.none', 'No Alignment');
             }
 
-            getAlignmentDetails(headingDiff, tiltDiff, position) {
+            getAlignmentDetails(headingDiff, elevationDiff, position) {
                 let details = [];
                 
-                // Corrected direction logic
+                // Check if device is pointing toward sky first
+                if (!this.isPointingTowardSky()) {
+                    details.push(this.t('orientation.tiltUp', '⬆️ Point device toward the sky first'));
+                    return details.join(' • ');
+                }
+                
+                // Azimuth (horizontal direction) corrections
                 if (headingDiff > 2) {
                     const direction = this.deviceData.heading < position.azimuth ? 
                         this.t('alignment.turnRight', 'Turn right') : 
@@ -2340,18 +2525,21 @@
                     details.push(`${direction} ${Math.round(headingDiff)}°`);
                 }
                 
-                if (tiltDiff > 1) {
-                    const direction = this.deviceData.tilt < position.elevation ? 
-                        this.t('alignment.tiltUp', 'Tilt up') : 
-                        this.t('alignment.tiltDown', 'Tilt down');
-                    details.push(`${direction} ${Math.round(tiltDiff)}°`);
+                // Elevation (sky angle) corrections
+                if (elevationDiff > 1) {
+                    const currentSkyAngle = this.deviceData.skyAngle || 0;
+                    const direction = currentSkyAngle < position.elevation ? 
+                        this.t('alignment.tiltUp', 'Point higher in sky') : 
+                        this.t('alignment.tiltDown', 'Point lower in sky');
+                    details.push(`${direction} ${Math.round(elevationDiff)}°`);
                 }
                 
                 if (details.length === 0) {
-                    details.push(this.t('alignment.perfect', 'Dish is perfectly aligned with satellite'));
+                    details.push(this.t('alignment.perfect', 'Perfect alignment - dish pointing directly at satellite'));
                 }
                 
                 details.push(`${this.t('alignment.distance', 'Distance')}: ${position.distance} km`);
+                details.push(`Sky angle: ${(this.deviceData.skyAngle || 0).toFixed(1)}°`);
                 
                 return details.join(' • ');
             }
@@ -2367,12 +2555,26 @@
                 signalText.textContent = `${this.t('status.precision', 'Alignment Precision')}: ${Math.round(accuracy)}%`;
             }
 
+            generateCompassMarkings() {
+                const container = document.getElementById('compassMarkings');
+                container.innerHTML = '';
+                
+                for (let i = 0; i < 360; i += 15) {
+                    const mark = document.createElement('div');
+                    mark.className = i % 45 === 0 ? 'compass-mark major' : 'compass-mark';
+                    mark.style.transform = `translateX(-50%) rotate(${i}deg)`;
+                    container.appendChild(mark);
+                }
+            }
+
             updateSensorDisplay() {
-                // Update display values
+                // Update display values with sky angle information
+                const skyAngleDisplay = this.deviceData.skyAngle ? ` (${this.deviceData.skyAngle.toFixed(0)}° sky)` : '';
+                
                 document.getElementById('deviceHeading').innerHTML = 
                     `${this.deviceData.heading.toFixed(0)}°<span class="status-indicator ${this.deviceData.isCalibrated ? 'good' : ''}" id="headingIndicator"></span>`;
                 document.getElementById('deviceTilt').innerHTML = 
-                    `${this.deviceData.tilt.toFixed(0)}°<span class="status-indicator ${Math.abs(this.deviceData.tilt) < 45 ? 'good' : 'warning'}" id="tiltIndicator"></span>`;
+                    `${this.deviceData.tilt.toFixed(0)}°${skyAngleDisplay}<span class="status-indicator ${this.isPointingTowardSky() ? 'good' : 'warning'}" id="tiltIndicator"></span>`;
                 
                 // Update compass
                 const needle = document.getElementById('compassNeedle');
@@ -2396,6 +2598,7 @@
             updateSatelliteInfo() {
                 if (!this.selectedSatellite) {
                     this.elements.satelliteInfo.classList.remove('visible');
+                    this.showSkyGuide(); // Show guide when no satellite selected
                     return;
                 }
 
@@ -2418,70 +2621,95 @@
                     ${satellite.frequencies.slice(0, 3).join('<br>')}
                 `;
                 this.elements.satelliteInfo.classList.add('visible');
+                
+                // Update sky guide message to be more specific
+                if (this.elements.skyGuide) {
+                    const guideText = this.elements.skyGuide.querySelector('[data-key="guide.pointToSky"]');
+                    if (guideText) {
+                        guideText.textContent = this.t('guide.holdSteady', `Point toward ${satName} in the sky`);
+                    }
+                }
+                
+                // Check if we should hide the guide
+                this.checkGuideVisibility();
             }
 
             drawSatelliteMarker(position, headingDiff, elevationAccuracy) {
                 this.elements.satelliteMarkers.innerHTML = '';
 
-                if (headingDiff < 90 && elevationAccuracy > 10) {
-                    const marker = document.createElement('div');
-                    marker.className = 'satellite-marker';
-
-                    const markerContainer = document.createElement('div');
-                    markerContainer.className = 'marker-container';
-
-                    const markerCircle = document.createElement('div');
-                    markerCircle.className = 'marker-circle';
-
-                    // Determine marker status
-                    if (headingDiff < 2 && elevationAccuracy > 95) {
-                        markerCircle.classList.add('aligned');
-                    } else if (headingDiff < 5 && elevationAccuracy > 80) {
-                        markerCircle.classList.add('close');
-                    }
-
-                    // Satellite icon
-                    const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                    icon.setAttribute('class', 'marker-icon');
-                    icon.setAttribute('viewBox', '0 0 24 24');
-                    icon.innerHTML = `
-                        <path d="M12 2C12.5523 2 13 2.44772 13 3V5C13 5.55228 12.5523 6 12 6C11.4477 6 11 5.55228 11 5V3C11 2.44772 11.4477 2 12 2Z"/>
-                        <path d="M12 18C12.5523 18 13 18.4477 13 19V21C13 21.5523 12.5523 22 12 22C11.4477 22 11 21.5523 11 21V19C11 18.4477 11.4477 18 12 18Z"/>
-                        <path d="M22 12C22 12.5523 21.5523 13 21 13H19C18.4477 13 18 12.5523 18 12C18 11.4477 18.4477 11 19 11H21C21.5523 11 22 11.4477 22 12Z"/>
-                        <path d="M6 12C6 12.5523 5.55228 13 5 13H3C2.44772 13 2 12.5523 2 12C2 11.4477 2.44772 11 3 11H5C5.55228 11 6 11.4477 6 12Z"/>
-                        <circle cx="12" cy="12" r="3"/>
-                    `;
-                    markerCircle.appendChild(icon);
-
-                    const label = document.createElement('div');
-                    label.className = 'marker-label';
-                    const satellite = SATELLITE_DATABASE[this.selectedSatellite];
-                    label.textContent = satellite.name[this.currentLanguage] || satellite.name.en;
-
-                    markerContainer.appendChild(markerCircle);
-                    markerContainer.appendChild(label);
-                    marker.appendChild(markerContainer);
-
-                    // Calculate marker position (corrected for camera mirroring)
-                    const screenWidth = window.innerWidth;
-                    const screenHeight = window.innerHeight;
-
-                    const relativeAzimuth = position.azimuth - this.deviceData.heading;
-                    const relativeElevation = position.elevation - this.deviceData.tilt;
-
-                    // Convert to screen coordinates (account for mirrored camera)
-                    const x = screenWidth / 2 - (relativeAzimuth * screenWidth / 90); // Inverted X for mirrored camera
-                    const y = screenHeight / 2 - (relativeElevation * screenHeight / 90);
-
-                    // Clamp to screen bounds
-                    const clampedX = Math.max(80, Math.min(screenWidth - 80, x));
-                    const clampedY = Math.max(120, Math.min(screenHeight - 120, y));
-
-                    marker.style.left = clampedX + 'px';
-                    marker.style.top = clampedY + 'px';
-
-                    this.elements.satelliteMarkers.appendChild(marker);
+                // Only show marker if device is pointing toward sky and satellite is reasonably close
+                if (!this.isPointingTowardSky() || headingDiff > 45) {
+                    return;
                 }
+
+                const marker = document.createElement('div');
+                marker.className = 'satellite-marker';
+
+                const markerContainer = document.createElement('div');
+                markerContainer.className = 'marker-container';
+
+                const markerCircle = document.createElement('div');
+                markerCircle.className = 'marker-circle';
+
+                // Determine marker status based on sky-pointing accuracy
+                const currentSkyAngle = this.deviceData.skyAngle || 0;
+                const elevationDiff = Math.abs(currentSkyAngle - position.elevation);
+                
+                if (headingDiff < 2 && elevationDiff < 2) {
+                    markerCircle.classList.add('aligned');
+                } else if (headingDiff < 5 && elevationDiff < 5) {
+                    markerCircle.classList.add('close');
+                }
+
+                // Satellite icon
+                const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                icon.setAttribute('class', 'marker-icon');
+                icon.setAttribute('viewBox', '0 0 24 24');
+                icon.innerHTML = `
+                    <path d="M12 2C12.5523 2 13 2.44772 13 3V5C13 5.55228 12.5523 6 12 6C11.4477 6 11 5.55228 11 5V3C11 2.44772 11.4477 2 12 2Z"/>
+                    <path d="M12 18C12.5523 18 13 18.4477 13 19V21C13 21.5523 12.5523 22 12 22C11.4477 22 11 21.5523 11 21V19C11 18.4477 11.4477 18 12 18Z"/>
+                    <path d="M22 12C22 12.5523 21.5523 13 21 13H19C18.4477 13 18 12.5523 18 12C18 11.4477 18.4477 11 19 11H21C21.5523 11 22 11.4477 22 12Z"/>
+                    <path d="M6 12C6 12.5523 5.55228 13 5 13H3C2.44772 13 2 12.5523 2 12C2 11.4477 2.44772 11 3 11H5C5.55228 11 6 11.4477 6 12Z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                `;
+                markerCircle.appendChild(icon);
+
+                const label = document.createElement('div');
+                label.className = 'marker-label';
+                const satellite = SATELLITE_DATABASE[this.selectedSatellite];
+                label.textContent = satellite.name[this.currentLanguage] || satellite.name.en;
+
+                markerContainer.appendChild(markerCircle);
+                markerContainer.appendChild(label);
+                marker.appendChild(markerContainer);
+
+                // Calculate marker position for sky-pointing mode
+                const screenWidth = window.innerWidth;
+                const screenHeight = window.innerHeight;
+
+                // Calculate relative angles from current device orientation
+                const relativeAzimuth = position.azimuth - this.deviceData.heading;
+                const relativeElevation = position.elevation - currentSkyAngle;
+
+                // Convert to screen coordinates for sky-pointing view
+                // X axis: horizontal rotation (azimuth difference)
+                // Y axis: elevation difference (positive elevation = higher in sky = higher on screen)
+                const x = screenWidth / 2 + (relativeAzimuth * screenWidth / 60); // More sensitive for sky view
+                const y = screenHeight / 2 - (relativeElevation * screenHeight / 45); // Inverted Y for sky view
+
+                // Clamp to screen bounds with more generous margins for sky viewing
+                const clampedX = Math.max(100, Math.min(screenWidth - 100, x));
+                const clampedY = Math.max(150, Math.min(screenHeight - 150, y));
+
+                marker.style.left = clampedX + 'px';
+                marker.style.top = clampedY + 'px';
+
+                // Add pulsing effect for better visibility in sky view
+                if (headingDiff < 10 && elevationDiff < 10) {
+                    marker.style.animation = 'satellitePulse 1.5s infinite ease-in-out';
+                }
+
+                this.elements.satelliteMarkers.appendChild(marker);
             }
 
             // Interface Controls
