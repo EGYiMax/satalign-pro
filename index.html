@@ -1,36 +1,50 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SatAlign Pro Enterprise</title>
+    <title>SatAlign Pro Enterprise - Professional Satellite Dish Alignment</title>
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     
-    <!-- Meta tags for PWA -->
-    <meta name="theme-color" content="#1a1a1a">
+    <!-- Meta tags for PWA and SEO -->
+    <meta name="description" content="Professional satellite dish alignment application with AR guidance, supporting all major satellites worldwide.">
+    <meta name="keywords" content="satellite, dish, alignment, professional, enterprise, GPS, compass, AR">
+    <meta name="author" content="SatAlign Pro Enterprise">
+    <meta name="theme-color" content="#0066cc">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="SatAlign Pro">
+    <meta name="msapplication-TileColor" content="#0066cc">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https:;">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     
     <!-- Professional Icons -->
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3e%3ccircle cx='50' cy='50' r='40' fill='%231a1a1a'/%3e%3ccircle cx='50' cy='50' r='30' fill='none' stroke='%23ffffff' stroke-width='2'/%3e%3ccircle cx='50' cy='30' r='3' fill='%23ffffff'/%3e%3c/svg%3e">
+    <link rel="icon" href="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3e%3ccircle cx='50' cy='50' r='40' fill='%230066cc'/%3e%3ccircle cx='50' cy='50' r='30' fill='none' stroke='%23ffffff' stroke-width='2'/%3e%3ccircle cx='50' cy='30' r='3' fill='%23ffffff'/%3e%3c/svg%3e">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3e%3ccircle cx='50' cy='50' r='40' fill='%230066cc'/%3e%3ccircle cx='50' cy='50' r='30' fill='none' stroke='%23ffffff' stroke-width='2'/%3e%3ccircle cx='50' cy='30' r='3' fill='%23ffffff'/%3e%3c/svg%3e">
     
     <style>
         :root {
-            --primary-color: #1a1a1a;
-            --secondary-color: #2d2d2d;
-            --accent-color: #0066cc;
+            --primary-color: #0066cc;
+            --secondary-color: #004499;
+            --accent-color: #0080ff;
             --success-color: #28a745;
             --warning-color: #ffc107;
             --danger-color: #dc3545;
+            --dark-bg: #1a1a1a;
+            --darker-bg: #0f0f0f;
             --text-primary: #ffffff;
-            --text-secondary: rgba(255,255,255,0.7);
-            --text-muted: rgba(255,255,255,0.5);
+            --text-secondary: rgba(255,255,255,0.8);
+            --text-muted: rgba(255,255,255,0.6);
             --border-color: rgba(255,255,255,0.1);
-            --glass-bg: rgba(26,26,26,0.85);
-            --glass-border: rgba(255,255,255,0.1);
+            --glass-bg: rgba(26,26,26,0.9);
+            --glass-border: rgba(255,255,255,0.15);
+            --shadow-color: rgba(0,0,0,0.5);
         }
 
         * {
@@ -39,16 +53,25 @@
             box-sizing: border-box;
         }
 
+        html {
+            font-size: 16px;
+            -webkit-text-size-adjust: 100%;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
         body {
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--primary-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: var(--darker-bg);
             color: var(--text-primary);
             overflow: hidden;
             position: relative;
             height: 100vh;
+            width: 100vw;
             user-select: none;
             font-weight: 400;
             letter-spacing: -0.01em;
+            line-height: 1.5;
         }
 
         body.rtl {
@@ -59,14 +82,27 @@
             direction: ltr;
         }
 
+        /* Video Background */
+        #videoContainer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
         #video {
             width: 100vw;
             height: 100vh;
             object-fit: cover;
-            filter: brightness(0.8) contrast(1.1);
+            filter: brightness(0.7) contrast(1.1);
+            transform: scaleX(-1); /* Mirror for selfie camera effect */
         }
 
-        .overlay {
+        /* AR Overlay */
+        .ar-overlay {
             position: absolute;
             top: 0;
             left: 0;
@@ -76,36 +112,36 @@
             z-index: 10;
         }
 
-        .hud-overlay {
+        /* HUD Interface */
+        .hud-interface {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 15;
+            z-index: 20;
         }
 
-        /* Top Panel with enhanced mobile support */
-        .top-panel {
+        /* Top Control Panel */
+        .control-panel {
             position: absolute;
-            top: env(safe-area-inset-top, 10px);
-            left: 10px;
-            right: 10px;
-            z-index: 20;
+            top: env(safe-area-inset-top, 20px);
+            left: 16px;
+            right: 16px;
             background: var(--glass-bg);
-            backdrop-filter: blur(40px);
+            backdrop-filter: blur(20px);
             border-radius: 16px;
-            padding: 16px;
+            padding: 20px;
             pointer-events: all;
             border: 1px solid var(--glass-border);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            max-height: 85vh;
+            box-shadow: 0 8px 32px var(--shadow-color);
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            max-height: 70vh;
             overflow-y: auto;
         }
 
-        .top-panel.collapsed {
+        .control-panel.collapsed {
             transform: translateY(-85%);
             opacity: 0.8;
         }
@@ -114,58 +150,57 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 12px;
         }
 
-        .app-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .toggle-controls {
+        .app-logo {
             display: flex;
-            gap: 8px;
             align-items: center;
-            flex-wrap: wrap;
+            gap: 12px;
         }
 
-        .control-btn {
+        .logo-icon {
             width: 32px;
             height: 32px;
-            border: none;
             border-radius: 8px;
-            background: var(--secondary-color);
-            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 14px;
-            min-width: 32px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
         }
 
-        .control-btn:hover {
-            background: var(--accent-color);
-            transform: scale(1.05);
+        .app-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
         }
 
-        .control-btn.active {
-            background: var(--accent-color);
+        .app-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 400;
         }
 
-        /* Language Toggle */
-        .language-toggle {
-            background: var(--secondary-color);
+        .header-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .language-selector {
+            background: var(--dark-bg);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 4px;
             display: flex;
-            font-size: 12px;
-            font-weight: 500;
+            gap: 2px;
         }
 
         .lang-btn {
@@ -175,214 +210,249 @@
             color: var(--text-secondary);
             border-radius: 4px;
             cursor: pointer;
-            transition: all 0.2s;
-            min-width: 40px;
+            transition: all 0.2s ease;
+            font-size: 12px;
+            font-weight: 500;
+            min-width: 36px;
         }
 
         .lang-btn.active {
-            background: var(--accent-color);
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,102,204,0.3);
+        }
+
+        .lang-btn:hover:not(.active) {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .control-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 8px;
+            background: var(--dark-bg);
             color: var(--text-primary);
-        }
-
-        /* Satellite Selector */
-        .satellite-selector {
-            margin-bottom: 16px;
-        }
-
-        .selector-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
             font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: var(--text-primary);
+            border: 1px solid var(--border-color);
         }
 
-        select {
+        .control-btn:hover {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        .control-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        /* Satellite Selection */
+        .satellite-section {
+            margin-bottom: 20px;
+        }
+
+        .section-label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .satellite-select {
             width: 100%;
-            padding: 12px 16px;
+            padding: 14px 16px;
             border-radius: 12px;
             border: 1px solid var(--border-color);
-            background: var(--secondary-color);
+            background: var(--dark-bg);
             color: var(--text-primary);
             font-size: 15px;
             appearance: none;
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-            background-position: left 12px center;
+            background-position: right 12px center;
             background-repeat: no-repeat;
             background-size: 16px;
-            padding-left: 40px;
-            transition: all 0.2s;
-        }
-
-        .ltr select {
-            background-position: right 12px center;
-            padding-left: 16px;
             padding-right: 40px;
+            transition: all 0.2s ease;
+            cursor: pointer;
         }
 
-        select:focus {
+        .rtl .satellite-select {
+            background-position: left 12px center;
+            padding-left: 40px;
+            padding-right: 16px;
+        }
+
+        .satellite-select:focus {
             outline: none;
-            border-color: var(--accent-color);
+            border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
         }
 
-        /* Professional Metrics Grid */
+        .satellite-select:hover {
+            border-color: var(--primary-color);
+        }
+
+        /* Metrics Grid */
+        .metrics-section {
+            margin-bottom: 20px;
+        }
+
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 8px;
-            margin-bottom: 16px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
         }
 
         .metric-card {
-            background: var(--secondary-color);
+            background: var(--dark-bg);
             border: 1px solid var(--border-color);
-            padding: 12px 8px;
+            padding: 16px 12px;
             border-radius: 12px;
             text-align: center;
-            transition: all 0.2s;
-            min-width: 100px;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .metric-card:hover::before {
+            opacity: 1;
         }
 
         .metric-card:hover {
-            background: rgba(45,45,45,0.8);
-            border-color: var(--accent-color);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,102,204,0.2);
         }
 
         .metric-label {
-            font-size: 10px;
+            font-size: 11px;
             color: var(--text-muted);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-weight: 500;
         }
 
         .metric-value {
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 22px;
+            font-weight: 700;
             color: var(--text-primary);
             font-variant-numeric: tabular-nums;
+            line-height: 1;
+        }
+
+        .metric-unit {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 400;
         }
 
         /* Status Grid */
+        .status-section {
+            margin-bottom: 16px;
+        }
+
         .status-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 8px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
         }
 
         .status-card {
-            background: var(--secondary-color);
+            background: var(--dark-bg);
             border: 1px solid var(--border-color);
-            padding: 10px;
+            padding: 12px;
             border-radius: 10px;
             text-align: center;
-            transition: all 0.2s;
-            min-width: 120px;
+            transition: all 0.2s ease;
+        }
+
+        .status-card:hover {
+            border-color: var(--primary-color);
         }
 
         .status-label {
-            font-size: 9px;
+            font-size: 10px;
             color: var(--text-muted);
             margin-bottom: 4px;
             text-transform: uppercase;
             letter-spacing: 0.3px;
+            font-weight: 500;
         }
 
         .status-value {
-            font-size: 13px;
+            font-size: 16px;
             font-weight: 600;
             color: var(--text-primary);
             font-variant-numeric: tabular-nums;
         }
 
-        /* Professional Satellite Marker */
-        .satellite-marker {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            transition: all 0.3s ease;
-        }
-
-        .marker-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-
-        .marker-circle {
-            width: 100%;
-            height: 100%;
-            border: 3px solid var(--danger-color);
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: rgba(220,53,69,0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: satellitePulse 2s infinite;
-            box-shadow: 0 0 20px rgba(220,53,69,0.4);
+            margin-left: 6px;
+            background: var(--danger-color);
+            animation: pulse 2s infinite;
         }
 
-        .marker-circle.aligned {
-            border-color: var(--success-color);
-            background: rgba(40,167,69,0.15);
-            box-shadow: 0 0 20px rgba(40,167,69,0.4);
+        .status-indicator.good {
+            background: var(--success-color);
         }
 
-        .marker-circle.close {
-            border-color: var(--warning-color);
-            background: rgba(255,193,7,0.15);
-            box-shadow: 0 0 20px rgba(255,193,7,0.4);
+        .status-indicator.warning {
+            background: var(--warning-color);
         }
 
-        .marker-icon {
-            width: 24px;
-            height: 24px;
-            fill: currentColor;
-            color: var(--text-primary);
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
 
-        .marker-label {
-            position: absolute;
-            bottom: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: 500;
-            white-space: nowrap;
-            border: 1px solid var(--glass-border);
-        }
-
-        @keyframes satellitePulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        /* Professional Crosshair */
+        /* Crosshair */
         .crosshair {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             transform: translate(-50%, -50%);
             pointer-events: none;
+            z-index: 15;
         }
 
         .crosshair-circle {
             width: 100%;
             height: 100%;
-            border: 2px solid var(--accent-color);
+            border: 2px solid var(--primary-color);
             border-radius: 50%;
             position: relative;
             background: rgba(0,102,204,0.05);
+            box-shadow: 0 0 20px rgba(0,102,204,0.3);
         }
 
         .crosshair-lines {
@@ -394,7 +464,8 @@
 
         .crosshair-h, .crosshair-v {
             position: absolute;
-            background: var(--accent-color);
+            background: var(--primary-color);
+            box-shadow: 0 0 10px rgba(0,102,204,0.5);
         }
 
         .crosshair-h {
@@ -411,20 +482,21 @@
             top: -20px;
         }
 
-        /* Professional Compass */
+        /* Compass */
         .compass-container {
             position: absolute;
-            bottom: env(safe-area-inset-bottom, 20px);
+            bottom: env(safe-area-inset-bottom, 120px);
             right: 20px;
             width: 100px;
             height: 100px;
+            z-index: 25;
         }
 
         .compass {
             width: 100%;
             height: 100%;
             background: var(--glass-bg);
-            backdrop-filter: blur(40px);
+            backdrop-filter: blur(20px);
             border: 2px solid var(--border-color);
             border-radius: 50%;
             display: flex;
@@ -434,19 +506,21 @@
             font-size: 14px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 32px var(--shadow-color);
         }
 
         .compass-needle {
             position: absolute;
             width: 3px;
             height: 35px;
-            background: var(--danger-color);
+            background: linear-gradient(180deg, var(--danger-color), var(--warning-color));
             top: 15px;
             left: 50%;
             transform-origin: bottom center;
             transform: translateX(-50%);
             border-radius: 2px;
+            box-shadow: 0 0 8px rgba(220,53,69,0.5);
+            transition: transform 0.3s ease;
         }
 
         .compass-markings {
@@ -457,7 +531,7 @@
 
         .compass-mark {
             position: absolute;
-            width: 2px;
+            width: 1px;
             height: 8px;
             background: var(--text-muted);
             left: 50%;
@@ -467,104 +541,214 @@
 
         .compass-mark.major {
             height: 12px;
-            width: 3px;
+            width: 2px;
             background: var(--text-primary);
         }
 
-        /* Professional Alignment Panel */
+        /* Alignment Panel */
         .alignment-panel {
             position: absolute;
             bottom: env(safe-area-inset-bottom, 20px);
             left: 20px;
-            right: 130px;
+            right: 140px;
             background: var(--glass-bg);
-            backdrop-filter: blur(40px);
+            backdrop-filter: blur(20px);
             border-radius: 16px;
-            padding: 16px;
+            padding: 20px;
             border: 1px solid var(--glass-border);
             text-align: center;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 8px 32px var(--shadow-color);
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            pointer-events: all;
         }
 
         .alignment-panel.collapsed {
-            transform: translateY(75%);
+            transform: translateY(80%);
             opacity: 0.8;
         }
 
         .alignment-status {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 6px;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
         }
 
         .alignment-details {
-            font-size: 12px;
+            font-size: 14px;
             color: var(--text-secondary);
-            margin-bottom: 10px;
+            margin-bottom: 16px;
             line-height: 1.4;
         }
 
         .signal-strength {
             width: 100%;
-            height: 6px;
-            background: var(--secondary-color);
-            border-radius: 3px;
+            height: 8px;
+            background: var(--dark-bg);
+            border-radius: 4px;
             overflow: hidden;
-            margin-bottom: 6px;
+            margin-bottom: 12px;
             border: 1px solid var(--border-color);
+            position: relative;
         }
 
         .signal-bar {
             height: 100%;
             background: linear-gradient(90deg, var(--danger-color), var(--warning-color), var(--success-color));
-            border-radius: 3px;
-            transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border-radius: 4px;
+            transition: width 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .signal-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
         }
 
         .signal-text {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--text-muted);
             font-variant-numeric: tabular-nums;
+            font-weight: 500;
         }
 
-        /* Professional Satellite Info Panel */
+        /* Satellite Marker */
+        .satellite-marker {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 12;
+        }
+
+        .marker-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .marker-circle {
+            width: 100%;
+            height: 100%;
+            border: 3px solid var(--danger-color);
+            border-radius: 50%;
+            background: rgba(220,53,69,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: satellitePulse 2s infinite ease-in-out;
+            box-shadow: 0 0 20px rgba(220,53,69,0.4);
+        }
+
+        .marker-circle.aligned {
+            border-color: var(--success-color);
+            background: rgba(40,167,69,0.1);
+            box-shadow: 0 0 20px rgba(40,167,69,0.4);
+        }
+
+        .marker-circle.close {
+            border-color: var(--warning-color);
+            background: rgba(255,193,7,0.1);
+            box-shadow: 0 0 20px rgba(255,193,7,0.4);
+        }
+
+        .marker-icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+            color: var(--text-primary);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .marker-label {
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        @keyframes satellitePulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.08); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Satellite Info Panel */
         .satellite-info {
             position: absolute;
             top: 50%;
             left: 20px;
             transform: translateY(-50%);
             background: var(--glass-bg);
-            backdrop-filter: blur(40px);
+            backdrop-filter: blur(20px);
             border-radius: 12px;
-            padding: 14px;
+            padding: 16px;
             border: 1px solid var(--glass-border);
-            max-width: 250px;
+            max-width: 280px;
             opacity: 0;
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            box-shadow: 0 8px 32px var(--shadow-color);
+            pointer-events: all;
         }
 
         .satellite-info.visible {
             opacity: 1;
+            transform: translateY(-50%) translateX(0);
         }
 
         .sat-name {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
             color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sat-icon {
+            width: 20px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
         }
 
         .sat-details {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--text-secondary);
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         .sat-details strong {
             color: var(--text-primary);
-            font-weight: 500;
+            font-weight: 600;
         }
 
         /* Coordinates Display */
@@ -574,13 +758,13 @@
             right: 20px;
             transform: translateY(-50%);
             background: var(--glass-bg);
-            backdrop-filter: blur(40px);
+            backdrop-filter: blur(20px);
             border-radius: 12px;
-            padding: 14px;
+            padding: 16px;
             border: 1px solid var(--glass-border);
-            min-width: 180px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            min-width: 200px;
+            box-shadow: 0 8px 32px var(--shadow-color);
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
 
         .coordinates-display.collapsed {
@@ -589,9 +773,9 @@
         }
 
         .coord-header {
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             color: var(--text-primary);
             text-align: center;
         }
@@ -599,40 +783,42 @@
         .coord-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 6px;
-            font-size: 11px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            align-items: center;
         }
 
         .coord-label {
             color: var(--text-muted);
+            font-weight: 500;
         }
 
         .coord-value {
             color: var(--text-primary);
-            font-weight: 500;
+            font-weight: 600;
             font-variant-numeric: tabular-nums;
         }
 
-        /* Toggle show/hide button - improved visibility */
+        /* Toggle Button */
         .toggle-show-btn {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 50px;
-            height: 50px;
+            width: 56px;
+            height: 56px;
             background: var(--glass-bg);
-            backdrop-filter: blur(40px);
-            border: 2px solid var(--accent-color);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--primary-color);
             border-radius: 50%;
             color: var(--text-primary);
             font-size: 20px;
             cursor: pointer;
             z-index: 30;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             display: none;
             pointer-events: all;
-            box-shadow: 0 4px 20px rgba(0,102,204,0.3);
+            box-shadow: 0 8px 32px rgba(0,102,204,0.4);
         }
 
         .toggle-show-btn.visible {
@@ -643,32 +829,59 @@
 
         .toggle-show-btn:hover {
             transform: translate(-50%, -50%) scale(1.1);
-            box-shadow: 0 6px 25px rgba(0,102,204,0.4);
+            box-shadow: 0 12px 40px rgba(0,102,204,0.5);
+            border-color: var(--accent-color);
         }
 
         /* Loading Screen */
         .loading-screen {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--primary-color);
+            background: linear-gradient(135deg, var(--darker-bg), var(--dark-bg));
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 100;
+            z-index: 1000;
+        }
+
+        .loading-content {
+            text-align: center;
+            max-width: 400px;
+            padding: 20px;
+        }
+
+        .loading-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            animation: loadingPulse 2s infinite ease-in-out;
+        }
+
+        @keyframes loadingPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
 
         .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid var(--secondary-color);
-            border-top: 3px solid var(--accent-color);
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+            margin: 0 auto 30px;
         }
 
         @keyframes spin {
@@ -677,70 +890,102 @@
         }
 
         .loading-text {
-            font-size: 16px;
-            font-weight: 500;
+            font-size: 20px;
+            font-weight: 600;
             color: var(--text-primary);
-            text-align: center;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .loading-details {
-            font-size: 12px;
+            font-size: 14px;
             color: var(--text-secondary);
-            text-align: center;
+            margin-bottom: 30px;
         }
 
         /* Permission Steps */
         .permission-buttons {
-            margin-top: 20px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 16px;
             align-items: center;
-            max-width: 350px;
+            max-width: 400px;
+            width: 100%;
         }
 
         .permission-step {
             text-align: center;
             width: 100%;
+            padding: 20px;
+            background: var(--glass-bg);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .step-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 16px;
+            background: var(--primary-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
         }
 
         .step-title {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             color: var(--text-primary);
         }
 
         .step-description {
-            font-size: 12px;
+            font-size: 14px;
             color: var(--text-secondary);
-            line-height: 1.4;
-            margin-bottom: 10px;
+            line-height: 1.5;
+            margin-bottom: 16px;
         }
 
         .btn {
-            background: var(--accent-color);
-            color: var(--text-primary);
+            background: var(--primary-color);
+            color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 14px 28px;
             border-radius: 12px;
-            font-size: 14px;
-            font-weight: 500;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
-            min-width: 180px;
-            transition: all 0.2s;
+            min-width: 200px;
+            transition: all 0.2s ease;
             border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn:hover {
-            background: #0052a3;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0,102,204,0.3);
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,102,204,0.3);
         }
 
         .btn:disabled {
-            background: var(--secondary-color);
+            background: var(--dark-bg);
             color: var(--text-muted);
             cursor: not-allowed;
             transform: none;
@@ -757,125 +1002,145 @@
 
         /* Error Dialog */
         .error-dialog {
-            position: absolute;
+            position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             background: var(--glass-bg);
-            backdrop-filter: blur(40px);
-            padding: 20px;
+            backdrop-filter: blur(20px);
+            padding: 30px;
             border-radius: 16px;
             text-align: center;
-            max-width: 300px;
+            max-width: 400px;
+            width: 90%;
             border: 1px solid var(--danger-color);
-            box-shadow: 0 8px 32px rgba(220,53,69,0.3);
-            z-index: 200;
+            box-shadow: 0 20px 60px rgba(220,53,69,0.3);
+            z-index: 2000;
+            animation: errorSlideIn 0.3s ease-out;
+        }
+
+        @keyframes errorSlideIn {
+            from { 
+                opacity: 0; 
+                transform: translate(-50%, -50%) scale(0.9); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1); 
+            }
+        }
+
+        .error-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            background: var(--danger-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
         }
 
         .error-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 10px;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
             color: var(--danger-color);
         }
 
         .error-message {
-            font-size: 12px;
+            font-size: 14px;
             color: var(--text-secondary);
-            line-height: 1.4;
+            line-height: 1.5;
+            margin-bottom: 20px;
         }
 
-        /* Mobile Responsive Design */
+        .error-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--dark-bg);
+            border-color: var(--primary-color);
+        }
+
+        /* Responsive Design */
         @media (max-width: 480px) {
-            .top-panel {
-                top: env(safe-area-inset-top, 5px);
-                left: 5px;
-                right: 5px;
-                padding: 12px;
+            .control-panel {
+                top: env(safe-area-inset-top, 10px);
+                left: 10px;
+                right: 10px;
+                padding: 16px;
             }
 
             .app-title {
-                font-size: 14px;
+                font-size: 16px;
             }
 
             .metrics-grid {
                 grid-template-columns: repeat(3, 1fr);
-                gap: 6px;
+                gap: 8px;
             }
 
-            .status-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 6px;
+            .metric-card {
+                padding: 12px 8px;
+            }
+
+            .metric-value {
+                font-size: 18px;
             }
 
             .alignment-panel {
-                left: 5px;
-                right: 110px;
-                padding: 12px;
+                left: 10px;
+                right: 120px;
+                padding: 16px;
             }
 
             .compass-container {
-                right: 5px;
+                right: 10px;
                 width: 80px;
                 height: 80px;
             }
 
-            .compass {
-                font-size: 12px;
-            }
-
             .compass-needle {
-                height: 25px;
+                height: 28px;
                 top: 15px;
             }
 
             .satellite-info {
-                left: 5px;
-                max-width: 200px;
-                padding: 12px;
+                left: 10px;
+                max-width: 250px;
+                padding: 14px;
             }
 
             .coordinates-display {
-                right: 5px;
-                min-width: 150px;
-                padding: 12px;
-            }
-
-            .metric-value {
-                font-size: 16px;
-            }
-
-            .status-value {
-                font-size: 12px;
+                right: 10px;
+                min-width: 180px;
+                padding: 14px;
             }
         }
 
         @media (max-width: 360px) {
             .metrics-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 4px;
+                gap: 6px;
             }
 
             .metric-card {
-                padding: 8px 4px;
-                min-width: 80px;
+                padding: 10px 6px;
             }
 
             .metric-value {
-                font-size: 14px;
-            }
-
-            .metric-label {
-                font-size: 9px;
-            }
-
-            .status-card {
-                padding: 8px;
-                min-width: 100px;
-            }
-
-            .app-title {
-                font-size: 12px;
+                font-size: 16px;
             }
 
             .compass-container {
@@ -884,7 +1149,7 @@
             }
 
             .alignment-panel {
-                right: 85px;
+                right: 90px;
             }
         }
 
@@ -897,6 +1162,20 @@
             }
         }
 
+        @media (prefers-color-scheme: light) {
+            :root {
+                --dark-bg: #f8f9fa;
+                --darker-bg: #ffffff;
+                --text-primary: #212529;
+                --text-secondary: rgba(33,37,41,0.8);
+                --text-muted: rgba(33,37,41,0.6);
+                --border-color: rgba(0,0,0,0.1);
+                --glass-bg: rgba(255,255,255,0.9);
+                --glass-border: rgba(0,0,0,0.1);
+                --shadow-color: rgba(0,0,0,0.1);
+            }
+        }
+
         /* High contrast mode */
         @media (prefers-contrast: high) {
             :root {
@@ -904,55 +1183,81 @@
                 --glass-border: rgba(255,255,255,0.2);
             }
         }
+
+        /* Focus styles for accessibility */
+        .focusable:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* Print styles */
+        @media print {
+            .control-panel,
+            .alignment-panel,
+            .compass-container,
+            .satellite-info,
+            .coordinates-display {
+                display: none;
+            }
+        }
     </style>
 </head>
-<body class="rtl">
+<body class="ltr">
     <!-- Loading Screen -->
     <div id="loadingScreen" class="loading-screen">
-        <div class="loading-spinner"></div>
-        <div class="loading-text" data-key="loading.title">جاري تهيئة النظام</div>
-        <div id="loadingDetails" class="loading-details" data-key="loading.details">بدء التشغيل...</div>
-        
-        <div id="permissionButtons" class="permission-buttons" style="display: none;">
-            <div class="permission-step">
-                <div class="step-title" data-key="permissions.camera.title">صلاحية الكاميرا مطلوبة</div>
-                <div class="step-description" data-key="permissions.camera.description">نحتاج للكاميرا لعرض الاتجاه الحقيقي للسماء</div>
-                <button class="btn" id="cameraBtn" onclick="requestCameraPermission()">
-                    <span data-key="permissions.camera.button">منح صلاحية الكاميرا</span>
-                </button>
-            </div>
+        <div class="loading-content">
+            <div class="loading-logo">🛰️</div>
+            <div class="loading-text" data-key="loading.title">Initializing System</div>
+            <div id="loadingDetails" class="loading-details" data-key="loading.details">Starting up...</div>
+            <div class="loading-spinner"></div>
+            
+            <div id="permissionButtons" class="permission-buttons" style="display: none;">
+                <div class="permission-step">
+                    <div class="step-icon">📷</div>
+                    <div class="step-title" data-key="permissions.camera.title">Camera Access Required</div>
+                    <div class="step-description" data-key="permissions.camera.description">We need camera access to display the real sky view and provide AR guidance</div>
+                    <button class="btn focusable" id="cameraBtn" onclick="requestCameraPermission()">
+                        <span data-key="permissions.camera.button">Grant Camera Access</span>
+                    </button>
+                </div>
 
-            <div class="permission-step">
-                <div class="step-title" data-key="permissions.location.title">صلاحية الموقع مطلوبة</div>
-                <div class="step-description" data-key="permissions.location.description">نحتاج موقعك لحساب اتجاه الأقمار الصناعية بدقة</div>
-                <button class="btn" id="locationBtn" onclick="requestLocationPermission()" disabled>
-                    <span data-key="permissions.location.button">منح صلاحية الموقع</span>
-                </button>
-            </div>
+                <div class="permission-step">
+                    <div class="step-icon">📍</div>
+                    <div class="step-title" data-key="permissions.location.title">Location Access Required</div>
+                    <div class="step-description" data-key="permissions.location.description">We need your location to calculate satellite positions accurately</div>
+                    <button class="btn focusable" id="locationBtn" onclick="requestLocationPermission()" disabled>
+                        <span data-key="permissions.location.button">Grant Location Access</span>
+                    </button>
+                </div>
 
-            <div class="permission-step">
-                <div class="step-title" data-key="permissions.sensors.title">صلاحية أجهزة الاستشعار مطلوبة</div>
-                <div class="step-description" data-key="permissions.sensors.description">نحتاج البوصلة ومقياس الإمالة لتحديد اتجاه الجهاز</div>
-                <button class="btn" id="orientationBtn" onclick="requestOrientationPermission()" disabled>
-                    <span data-key="permissions.sensors.button">منح صلاحية الاستشعار</span>
-                </button>
-            </div>
+                <div class="permission-step">
+                    <div class="step-icon">🧭</div>
+                    <div class="step-title" data-key="permissions.sensors.title">Device Sensors Required</div>
+                    <div class="step-description" data-key="permissions.sensors.description">We need compass and orientation sensors to detect device direction</div>
+                    <button class="btn focusable" id="orientationBtn" onclick="requestOrientationPermission()" disabled>
+                        <span data-key="permissions.sensors.button">Grant Sensor Access</span>
+                    </button>
+                </div>
 
-            <div class="permission-step" id="startStep" style="display: none;">
-                <div class="step-title" data-key="permissions.complete.title">تم منح جميع الصلاحيات</div>
-                <div class="step-description" data-key="permissions.complete.description">يمكنك الآن استخدام التطبيق بكامل إمكانياته</div>
-                <button class="btn success" onclick="finishSetup()">
-                    <span data-key="permissions.complete.button">تشغيل التطبيق</span>
-                </button>
+                <div class="permission-step" id="startStep" style="display: none;">
+                    <div class="step-icon">✅</div>
+                    <div class="step-title" data-key="permissions.complete.title">All Permissions Granted</div>
+                    <div class="step-description" data-key="permissions.complete.description">You can now use the application with full capabilities</div>
+                    <button class="btn success focusable" onclick="finishSetup()">
+                        <span data-key="permissions.complete.button">Launch Application</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Video Background -->
-    <video id="video" autoplay playsinline muted></video>
+    <div id="videoContainer">
+        <video id="video" autoplay playsinline muted></video>
+    </div>
     
     <!-- AR Overlay -->
-    <div class="overlay">
+    <div class="ar-overlay">
         <div class="crosshair">
             <div class="crosshair-circle">
                 <div class="crosshair-lines">
@@ -964,75 +1269,89 @@
         <div id="satelliteMarkers"></div>
     </div>
 
-    <!-- Toggle Show Button (appears when panels are hidden) -->
-    <button class="toggle-show-btn" id="toggleShowBtn" onclick="showPanels()">
+    <!-- Toggle Show Button -->
+    <button class="toggle-show-btn focusable" id="toggleShowBtn" onclick="showPanels()" aria-label="Show Interface">
         ▲
     </button>
 
     <!-- HUD Interface -->
-    <div class="hud-overlay">
+    <div class="hud-interface">
         <!-- Top Control Panel -->
-        <div class="top-panel" id="topPanel">
+        <div class="control-panel" id="controlPanel">
             <div class="panel-header">
-                <div class="app-title">SatAlign Pro Enterprise</div>
-                <div class="toggle-controls">
-                    <div class="language-toggle">
-                        <button class="lang-btn active" onclick="switchLanguage('ar')">AR</button>
-                        <button class="lang-btn" onclick="switchLanguage('en')">EN</button>
+                <div class="app-logo">
+                    <div class="logo-icon">S</div>
+                    <div>
+                        <div class="app-title">SatAlign Pro Enterprise</div>
+                        <div class="app-subtitle">Professional Satellite Alignment</div>
                     </div>
-                    <button class="control-btn" id="togglePanels" onclick="togglePanels()" title="إخفاء/إظهار الواجهة">
+                </div>
+                <div class="header-controls">
+                    <div class="language-selector">
+                        <button class="lang-btn active focusable" onclick="switchLanguage('en')" aria-label="English">EN</button>
+                        <button class="lang-btn focusable" onclick="switchLanguage('ar')" aria-label="Arabic">عر</button>
+                    </div>
+                    <button class="control-btn focusable" id="togglePanels" onclick="togglePanels()" title="Toggle Interface" aria-label="Toggle Interface">
                         <span>▼</span>
                     </button>
                 </div>
             </div>
             
-            <div class="satellite-selector">
-                <div class="selector-label" data-key="interface.satellite.label">اختيار القمر الصناعي</div>
-                <select id="satelliteSelect">
-                    <!-- سيتم ملؤها بواسطة JavaScript -->
+            <div class="satellite-section">
+                <div class="section-label" data-key="interface.satellite.label">
+                    🛰️ Satellite Selection
+                </div>
+                <select id="satelliteSelect" class="satellite-select focusable" aria-label="Select Satellite">
+                    <!-- Will be populated by JavaScript -->
                 </select>
             </div>
             
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <div class="metric-label" data-key="metrics.azimuth">الاتجاه</div>
-                    <div class="metric-value" id="azimuth">--°</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-label" data-key="metrics.elevation">الارتفاع</div>
-                    <div class="metric-value" id="elevation">--°</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-label" data-key="metrics.skew">انحراف LNB</div>
-                    <div class="metric-value" id="skew">--°</div>
+            <div class="metrics-section">
+                <div class="section-label" data-key="metrics.title">📊 Alignment Metrics</div>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label" data-key="metrics.azimuth">Azimuth</div>
+                        <div class="metric-value" id="azimuth">--<span class="metric-unit">°</span></div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label" data-key="metrics.elevation">Elevation</div>
+                        <div class="metric-value" id="elevation">--<span class="metric-unit">°</span></div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label" data-key="metrics.skew">LNB Skew</div>
+                        <div class="metric-value" id="skew">--<span class="metric-unit">°</span></div>
+                    </div>
                 </div>
             </div>
             
-            <div class="status-grid">
-                <div class="status-card">
-                    <div class="status-label" data-key="status.compass">بوصلة الجهاز</div>
-                    <div class="status-value" id="deviceHeading">--°</div>
-                </div>
-                <div class="status-card">
-                    <div class="status-label" data-key="status.tilt">إمالة الجهاز</div>
-                    <div class="status-value" id="deviceTilt">--°</div>
-                </div>
-                <div class="status-card">
-                    <div class="status-label" data-key="status.accuracy">دقة GPS</div>
-                    <div class="status-value" id="gpsAccuracy">--m</div>
-                </div>
-                <div class="status-card">
-                    <div class="status-label" data-key="status.declination">الانحراف المغناطيسي</div>
-                    <div class="status-value" id="magneticDeclination">--°</div>
+            <div class="status-section">
+                <div class="section-label" data-key="status.title">📡 Device Status</div>
+                <div class="status-grid">
+                    <div class="status-card">
+                        <div class="status-label" data-key="status.compass">Device Heading</div>
+                        <div class="status-value" id="deviceHeading">--°<span class="status-indicator" id="headingIndicator"></span></div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-label" data-key="status.tilt">Device Tilt</div>
+                        <div class="status-value" id="deviceTilt">--°<span class="status-indicator" id="tiltIndicator"></span></div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-label" data-key="status.accuracy">GPS Accuracy</div>
+                        <div class="status-value" id="gpsAccuracy">--m<span class="status-indicator" id="gpsIndicator"></span></div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-label" data-key="status.declination">Magnetic Decl.</div>
+                        <div class="status-value" id="magneticDeclination">--°<span class="status-indicator good"></span></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Professional Compass -->
+        <!-- Compass -->
         <div class="compass-container" id="compassContainer">
             <div class="compass">
-                <div class="compass-markings">
-                    <!-- Compass markings will be generated by JS -->
+                <div class="compass-markings" id="compassMarkings">
+                    <!-- Generated by JavaScript -->
                 </div>
                 <div class="compass-needle" id="compassNeedle"></div>
                 <div id="compassDirection">N</div>
@@ -1041,45 +1360,65 @@
 
         <!-- Alignment Status Panel -->
         <div class="alignment-panel" id="alignmentPanel">
-            <div class="alignment-status" id="alignmentStatus" data-key="status.searching">البحث عن القمر الصناعي</div>
-            <div class="alignment-details" id="alignmentDetails" data-key="status.instructions">اختر قمر صناعي من الأعلى للبدء</div>
+            <div class="alignment-status" id="alignmentStatus" data-key="status.searching">Searching for Satellite</div>
+            <div class="alignment-details" id="alignmentDetails" data-key="status.instructions">Select a satellite from above to begin</div>
             <div class="signal-strength">
                 <div class="signal-bar" id="signalBar" style="width: 0%"></div>
             </div>
-            <div class="signal-text" id="signalText" data-key="status.precision">دقة التوجيه: 0%</div>
+            <div class="signal-text" id="signalText" data-key="status.precision">Alignment Precision: 0%</div>
         </div>
 
         <!-- Satellite Information Panel -->
         <div class="satellite-info" id="satelliteInfo">
-            <div class="sat-name" id="satName"></div>
+            <div class="sat-name" id="satName">
+                <div class="sat-icon">🛰️</div>
+                <span></span>
+            </div>
             <div class="sat-details" id="satDetails"></div>
         </div>
 
         <!-- Coordinates Display -->
         <div class="coordinates-display" id="coordinatesDisplay">
-            <div class="coord-header" data-key="coordinates.title">إحداثيات الهدف</div>
+            <div class="coord-header" data-key="coordinates.title">Target Coordinates</div>
             <div class="coord-item">
-                <span class="coord-label" data-key="coordinates.latitude">خط العرض:</span>
+                <span class="coord-label" data-key="coordinates.latitude">Latitude:</span>
                 <span class="coord-value" id="coordLat">--</span>
             </div>
             <div class="coord-item">
-                <span class="coord-label" data-key="coordinates.longitude">خط الطول:</span>
+                <span class="coord-label" data-key="coordinates.longitude">Longitude:</span>
                 <span class="coord-value" id="coordLon">--</span>
             </div>
             <div class="coord-item">
-                <span class="coord-label" data-key="coordinates.altitude">الارتفاع:</span>
+                <span class="coord-label" data-key="coordinates.altitude">Altitude:</span>
                 <span class="coord-value" id="coordAlt">35,786 km</span>
             </div>
             <div class="coord-item">
-                <span class="coord-label" data-key="coordinates.distance">المسافة:</span>
+                <span class="coord-label" data-key="coordinates.distance">Distance:</span>
                 <span class="coord-value" id="coordDistance">-- km</span>
             </div>
         </div>
     </div>
 
     <script>
-        // Professional Multilingual System
-        const translations = {
+        'use strict';
+
+        // Application Configuration
+        const APP_CONFIG = {
+            name: 'SatAlign Pro Enterprise',
+            version: '3.0.0',
+            build: '2024.07.10',
+            apiEndpoint: 'https://api.satalign.pro',
+            defaultLanguage: 'en',
+            supportedLanguages: ['en', 'ar'],
+            debug: false,
+            telemetry: {
+                enabled: true,
+                endpoint: 'https://telemetry.satalign.pro'
+            }
+        };
+
+        // Translation System
+        const TRANSLATIONS = {
             en: {
                 loading: {
                     title: "Initializing System",
@@ -1088,7 +1427,7 @@
                 permissions: {
                     camera: {
                         title: "Camera Access Required",
-                        description: "We need camera access to display the real sky view",
+                        description: "We need camera access to display the real sky view and provide AR guidance",
                         button: "Grant Camera Access"
                     },
                     location: {
@@ -1109,7 +1448,7 @@
                 },
                 interface: {
                     satellite: {
-                        label: "Satellite Selection",
+                        label: "🛰️ Satellite Selection",
                         placeholder: "-- Select Satellite --"
                     }
                 },
@@ -1119,18 +1458,20 @@
                     other: "Other Satellites"
                 },
                 metrics: {
+                    title: "📊 Alignment Metrics",
                     azimuth: "Azimuth",
                     elevation: "Elevation", 
                     skew: "LNB Skew"
                 },
                 status: {
+                    title: "📡 Device Status",
                     compass: "Device Heading",
                     tilt: "Device Tilt",
                     accuracy: "GPS Accuracy",
                     declination: "Magnetic Decl.",
                     searching: "Searching for Satellite",
                     instructions: "Select a satellite from above to begin",
-                    precision: "Alignment Precision: 0%",
+                    precision: "Alignment Precision",
                     perfect: "Perfect Alignment Achieved",
                     excellent: "Excellent Alignment",
                     good: "Good Alignment", 
@@ -1153,6 +1494,15 @@
                     degrees: "degrees",
                     perfect: "Dish is perfectly aligned with satellite",
                     distance: "Distance"
+                },
+                errors: {
+                    cameraFailed: "Failed to access camera",
+                    locationFailed: "Failed to get location",
+                    sensorsFailed: "Failed to access sensors",
+                    initFailed: "Initialization failed",
+                    permissionDenied: "Permission denied",
+                    networkError: "Network error",
+                    unknown: "An unknown error occurred"
                 }
             },
             ar: {
@@ -1163,7 +1513,7 @@
                 permissions: {
                     camera: {
                         title: "صلاحية الكاميرا مطلوبة",
-                        description: "نحتاج للكاميرا لعرض الاتجاه الحقيقي للسماء",
+                        description: "نحتاج للكاميرا لعرض الاتجاه الحقيقي للسماء وتوفير الإرشاد المعزز",
                         button: "منح صلاحية الكاميرا"
                     },
                     location: {
@@ -1184,7 +1534,7 @@
                 },
                 interface: {
                     satellite: {
-                        label: "اختيار القمر الصناعي",
+                        label: "🛰️ اختيار القمر الصناعي",
                         placeholder: "-- اختر القمر الصناعي --"
                     }
                 },
@@ -1194,18 +1544,20 @@
                     other: "أقمار أخرى"
                 },
                 metrics: {
+                    title: "📊 مقاييس التوجيه",
                     azimuth: "الاتجاه",
                     elevation: "الارتفاع",
                     skew: "انحراف LNB"
                 },
                 status: {
+                    title: "📡 حالة الجهاز",
                     compass: "بوصلة الجهاز",
                     tilt: "إمالة الجهاز",
                     accuracy: "دقة GPS",
                     declination: "الانحراف المغناطيسي",
                     searching: "البحث عن القمر الصناعي",
                     instructions: "اختر قمر صناعي من الأعلى للبدء",
-                    precision: "دقة التوجيه: 0%",
+                    precision: "دقة التوجيه",
                     perfect: "توجيه مثالي محقق",
                     excellent: "توجيه ممتاز",
                     good: "توجيه جيد",
@@ -1228,780 +1580,498 @@
                     degrees: "درجة",
                     perfect: "الطبق موجه بشكل مثالي نحو القمر الصناعي",
                     distance: "المسافة"
+                },
+                errors: {
+                    cameraFailed: "فشل في الوصول للكاميرا",
+                    locationFailed: "فشل في تحديد الموقع",
+                    sensorsFailed: "فشل في الوصول للمستشعرات",
+                    initFailed: "فشل في التهيئة",
+                    permissionDenied: "تم رفض الصلاحية",
+                    networkError: "خطأ في الشبكة",
+                    unknown: "حدث خطأ غير معروف"
                 }
             }
         };
 
-        // Global variables
-        let satApp = null;
-        let currentLanguage = 'ar';
-        let panelsCollapsed = false;
+        // Satellite Database
+        const SATELLITE_DATABASE = {
+            // Arab Satellites
+            'nilesat-201': {
+                name: { en: 'Nilesat 201', ar: 'نايل سات 201' },
+                longitude: -7.0,
+                description: { 
+                    en: 'Primary satellite for Middle East and North Africa broadcasting',
+                    ar: 'القمر الرئيسي للبث في الشرق الأوسط وشمال أفريقيا'
+                },
+                frequencies: ['11747 H', '11766 V', '11785 H', '11804 V', '11823 H'],
+                footprint: { en: 'MENA', ar: 'الشرق الأوسط وشمال أفريقيا' },
+                power: '8.5 kW',
+                operator: { en: 'Egyptian Satellite Company', ar: 'الشركة المصرية للأقمار الصناعية' },
+                launched: '2010',
+                orbital_position: '7°W',
+                transponders: 24
+            },
+            'nilesat-301': {
+                name: { en: 'Nilesat 301', ar: 'نايل سات 301' },
+                longitude: -7.0,
+                description: { 
+                    en: 'Latest Nilesat with advanced digital broadcasting technology',
+                    ar: 'أحدث أقمار نايل سات بتقنية البث الرقمي المتقدمة'
+                },
+                frequencies: ['11823 H', '11842 V', '11861 H', '11880 V', '11919 H'],
+                footprint: { en: 'MENA + Europe', ar: 'الشرق الأوسط وشمال أفريقيا وأوروبا' },
+                power: '12 kW',
+                operator: { en: 'Egyptian Satellite Company', ar: 'الشركة المصرية للأقمار الصناعية' },
+                launched: '2019',
+                orbital_position: '7°W',
+                transponders: 36
+            },
+            'arabsat-5a': {
+                name: { en: 'Arabsat 5A (Badr-4)', ar: 'عربسات 5A (بدر-4)' },
+                longitude: 30.5,
+                description: { 
+                    en: 'Advanced satellite covering Middle East, North Africa and Europe',
+                    ar: 'قمر متطور يغطي الشرق الأوسط وشمال أفريقيا وأوروبا'
+                },
+                frequencies: ['11996 V', '12015 H', '12034 V', '12053 H', '12072 V'],
+                footprint: { en: 'MENA + Europe', ar: 'الشرق الأوسط وأوروبا' },
+                power: '10.5 kW',
+                operator: { en: 'Arabsat', ar: 'عربسات' },
+                launched: '2010',
+                orbital_position: '30.5°E',
+                transponders: 32
+            },
+            'arabsat-5c': {
+                name: { en: 'Arabsat 5C (Badr-5)', ar: 'عربسات 5C (بدر-5)' },
+                longitude: 20.0,
+                description: { 
+                    en: 'Premium quality broadcasting services for Arab region',
+                    ar: 'خدمات بث فائقة الجودة للمنطقة العربية'
+                },
+                frequencies: ['11900 V', '11919 H', '11938 V', '11957 H', '11976 V'],
+                footprint: { en: 'MENA', ar: 'الشرق الأوسط وشمال أفريقيا' },
+                power: '9.8 kW',
+                operator: { en: 'Arabsat', ar: 'عربسات' },
+                launched: '2012',
+                orbital_position: '20°E',
+                transponders: 28
+            },
+            'badr-6': {
+                name: { en: 'Badr 6 (Arabsat-6A)', ar: 'بدر 6 (عربسات-6A)' },
+                longitude: 26.0,
+                description: { 
+                    en: 'Latest generation Badr satellite with Ka-band capabilities',
+                    ar: 'أحدث جيل من أقمار بدر مع قدرات Ka-band'
+                },
+                frequencies: ['12110 V', '12129 H', '12148 V', '12167 H', '12186 V'],
+                footprint: { en: 'MENA + Central Asia', ar: 'الشرق الأوسط وآسيا الوسطى' },
+                power: '16.8 kW',
+                operator: { en: 'Arabsat', ar: 'عربسات' },
+                launched: '2019',
+                orbital_position: '26°E',
+                transponders: 36
+            },
+            'badr-7': {
+                name: { en: 'Badr 7 (Arabsat-6B)', ar: 'بدر 7 (عربسات-6B)' },
+                longitude: 26.0,
+                description: { 
+                    en: 'Ultra-modern technology with enhanced coverage',
+                    ar: 'تقنية فائقة الحداثة مع تغطية محسنة'
+                },
+                frequencies: ['12205 H', '12224 V', '12243 H', '12262 V', '12281 H'],
+                footprint: { en: 'MENA + South Asia', ar: 'الشرق الأوسط وجنوب آسيا' },
+                power: '18.2 kW',
+                operator: { en: 'Arabsat', ar: 'عربسات' },
+                launched: '2020',
+                orbital_position: '26°E',
+                transponders: 40
+            },
 
-        // Professional Permission Functions
-        async function requestCameraPermission() {
-            const btn = document.getElementById('cameraBtn');
-            const locationBtn = document.getElementById('locationBtn');
-            
-            try {
-                btn.textContent = 'جاري المعالجة...';
-                btn.disabled = true;
+            // European Satellites
+            'hotbird-13f': {
+                name: { en: 'Hotbird 13F', ar: 'هوت بيرد 13F' },
+                longitude: 13.0,
+                description: { 
+                    en: 'Primary European broadcasting satellite with HD/4K capabilities',
+                    ar: 'القمر الأوروبي الرئيسي للبث مع قدرات HD/4K'
+                },
+                frequencies: ['10723 H', '10742 V', '10761 H', '10780 V', '10799 H'],
+                footprint: { en: 'Europe + North Africa', ar: 'أوروبا وشمال أفريقيا' },
+                power: '15.2 kW',
+                operator: { en: 'Eutelsat', ar: 'يوتلسات' },
+                launched: '2022',
+                orbital_position: '13°E',
+                transponders: 64
+            },
+            'hotbird-13g': {
+                name: { en: 'Hotbird 13G', ar: 'هوت بيرد 13G' },
+                longitude: 13.0,
+                description: { 
+                    en: 'Next-generation Hotbird with advanced broadcasting features',
+                    ar: 'الجيل التالي من هوت بيرد مع ميزات البث المتقدمة'
+                },
+                frequencies: ['10818 V', '10837 H', '10856 V', '10875 H', '10894 V'],
+                footprint: { en: 'Europe + North Africa', ar: 'أوروبا وشمال أفريقيا' },
+                power: '16.1 kW',
+                operator: { en: 'Eutelsat', ar: 'يوتلسات' },
+                launched: '2023',
+                orbital_position: '13°E',
+                transponders: 64
+            },
+            'astra-1kr': {
+                name: { en: 'Astra 1KR', ar: 'أسترا 1KR' },
+                longitude: 19.2,
+                description: { 
+                    en: 'Advanced European satellite for HD/UHD broadcasting',
+                    ar: 'قمر أوروبي متقدم للبث عالي الدقة/فائق الدقة'
+                },
+                frequencies: ['10714 H', '10744 V', '10773 H', '10803 V', '10832 H'],
+                footprint: { en: 'Europe', ar: 'أوروبا' },
+                power: '14.8 kW',
+                operator: { en: 'SES', ar: 'إس إي إس' },
+                launched: '2006',
+                orbital_position: '19.2°E',
+                transponders: 32
+            },
+            'astra-1l': {
+                name: { en: 'Astra 1L', ar: 'أسترا 1L' },
+                longitude: 19.2,
+                description: { 
+                    en: 'Modern Astra satellite with enhanced capacity',
+                    ar: 'قمر أسترا حديث بسعة محسنة'
+                },
+                frequencies: ['10862 V', '10891 H', '10920 V', '10949 H', '10979 V'],
+                footprint: { en: 'Europe', ar: 'أوروبا' },
+                power: '15.5 kW',
+                operator: { en: 'SES', ar: 'إس إي إس' },
+                launched: '2007',
+                orbital_position: '19.2°E',
+                transponders: 32
+            },
+            'eutelsat-16a': {
+                name: { en: 'Eutelsat 16A', ar: 'يوتلسات 16A' },
+                longitude: 16.0,
+                description: { 
+                    en: 'Comprehensive European satellite with wide coverage',
+                    ar: 'قمر أوروبي شامل بتغطية واسعة'
+                },
+                frequencies: ['11595 H', '11623 V', '11652 H', '11680 V', '11747 H'],
+                footprint: { en: 'Europe + Africa', ar: 'أوروبا وأفريقيا' },
+                power: '13.5 kW',
+                operator: { en: 'Eutelsat', ar: 'يوتلسات' },
+                launched: '2011',
+                orbital_position: '16°E',
+                transponders: 32
+            },
 
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'environment' } 
-                });
-                
-                stream.getTracks().forEach(track => track.stop());
-                
-                btn.textContent = '✓ تم منح صلاحية الكاميرا';
-                btn.classList.add('success');
-                satApp.cameraPermission = true;
-                
-                locationBtn.disabled = false;
-                
-            } catch (error) {
-                btn.textContent = '✗ فشل منح صلاحية الكاميرا';
-                btn.style.background = 'var(--danger-color)';
-                
-                setTimeout(() => {
-                    btn.textContent = 'إعادة المحاولة';
-                    btn.style.background = 'var(--accent-color)';
-                    btn.disabled = false;
-                }, 3000);
+            // Other International Satellites
+            'turksat-4a': {
+                name: { en: 'Turksat 4A', ar: 'تورك سات 4A' },
+                longitude: 42.0,
+                description: { 
+                    en: 'Primary Turkish satellite covering Turkey, Europe and MENA',
+                    ar: 'القمر التركي الرئيسي يغطي تركيا وأوروبا والشرق الأوسط'
+                },
+                frequencies: ['11957 V', '11975 H', '12034 V', '12053 H', '12072 V'],
+                footprint: { en: 'Turkey + Europe + MENA', ar: 'تركيا وأوروبا والشرق الأوسط' },
+                power: '11.8 kW',
+                operator: { en: 'Turksat', ar: 'تورك سات' },
+                launched: '2014',
+                orbital_position: '42°E',
+                transponders: 52
+            },
+            'turksat-4b': {
+                name: { en: 'Turksat 4B', ar: 'تورك سات 4B' },
+                longitude: 42.0,
+                description: { 
+                    en: 'Advanced Turksat with enhanced Ka-band capabilities',
+                    ar: 'تورك سات متقدم مع قدرات Ka-band محسنة'
+                },
+                frequencies: ['12091 H', '12110 V', '12129 H', '12148 V', '12167 H'],
+                footprint: { en: 'Turkey + Europe + MENA', ar: 'تركيا وأوروبا والشرق الأوسط' },
+                power: '12.5 kW',
+                operator: { en: 'Turksat', ar: 'تورك سات' },
+                launched: '2015',
+                orbital_position: '42°E',
+                transponders: 52
+            },
+            'hispasat-30w-6': {
+                name: { en: 'Hispasat 30W-6', ar: 'هيسباسات 30W-6' },
+                longitude: -30.0,
+                description: { 
+                    en: 'Advanced Atlantic satellite covering Americas and Europe',
+                    ar: 'قمر أطلسي متقدم يغطي الأمريكتين وأوروبا'
+                },
+                frequencies: ['11876 H', '11934 V', '11992 H', '12051 V', '12110 H'],
+                footprint: { en: 'Americas + Europe', ar: 'الأمريكتان وأوروبا' },
+                power: '14.2 kW',
+                operator: { en: 'Hispasat', ar: 'هيسباسات' },
+                launched: '2018',
+                orbital_position: '30°W',
+                transponders: 48
+            },
+            'intelsat-33e': {
+                name: { en: 'Intelsat 33e', ar: 'إنتلسات 33e' },
+                longitude: 60.0,
+                description: { 
+                    en: 'High-throughput satellite covering Asia Pacific and MENA',
+                    ar: 'قمر عالي الإنتاجية يغطي آسيا المحيط الهادئ والشرق الأوسط'
+                },
+                frequencies: ['11135 H', '11175 V', '11215 H', '11255 V', '11295 H'],
+                footprint: { en: 'Asia Pacific + MENA', ar: 'آسيا المحيط الهادئ والشرق الأوسط' },
+                power: '16.8 kW',
+                operator: { en: 'Intelsat', ar: 'إنتلسات' },
+                launched: '2016',
+                orbital_position: '60°E',
+                transponders: 64
+            },
+            'amos-17': {
+                name: { en: 'Amos 17', ar: 'عاموس 17' },
+                longitude: 17.0,
+                description: { 
+                    en: 'Modern Ka/Ku-band satellite covering Africa and Middle East',
+                    ar: 'قمر حديث Ka/Ku-band يغطي أفريقيا والشرق الأوسط'
+                },
+                frequencies: ['10843 V', '10883 H', '10923 V', '10963 H', '11003 V'],
+                footprint: { en: 'Africa + Middle East', ar: 'أفريقيا والشرق الأوسط' },
+                power: '10.5 kW',
+                operator: { en: 'Spacecom', ar: 'سبيس كوم' },
+                launched: '2019',
+                orbital_position: '17°E',
+                transponders: 24
             }
-        }
+        };
 
-        async function requestLocationPermission() {
-            const btn = document.getElementById('locationBtn');
-            const orientationBtn = document.getElementById('orientationBtn');
-            
-            try {
-                btn.textContent = 'جاري المعالجة...';
-                btn.disabled = true;
-
-                await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                            satApp.userLat = position.coords.latitude;
-                            satApp.userLon = position.coords.longitude;
-                            satApp.gpsAccuracy = Math.round(position.coords.accuracy);
-                            resolve();
-                        },
-                        (error) => reject(error),
-                        { enableHighAccuracy: true, timeout: 15000 }
-                    );
-                });
-                
-                btn.textContent = '✓ تم منح صلاحية الموقع';
-                btn.classList.add('success');
-                satApp.locationPermission = true;
-                
-                orientationBtn.disabled = false;
-                
-            } catch (error) {
-                btn.textContent = '✗ فشل منح صلاحية الموقع';
-                btn.style.background = 'var(--danger-color)';
-                
-                setTimeout(() => {
-                    btn.textContent = 'إعادة المحاولة';
-                    btn.style.background = 'var(--accent-color)';
-                    btn.disabled = false;
-                }, 3000);
-            }
-        }
-
-        async function requestOrientationPermission() {
-            const btn = document.getElementById('orientationBtn');
-            const startStep = document.getElementById('startStep');
-            
-            try {
-                btn.textContent = 'جاري المعالجة...';
-                btn.disabled = true;
-
-                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    const permission = await DeviceOrientationEvent.requestPermission();
-                    if (permission !== 'granted') {
-                        throw new Error('Permission denied');
-                    }
-                }
-                
-                btn.textContent = '✓ تم منح صلاحية الاستشعار';
-                btn.classList.add('success');
-                satApp.orientationPermission = true;
-                
-                startStep.style.display = 'block';
-                
-            } catch (error) {
-                btn.textContent = '✗ فشل منح صلاحية الاستشعار';
-                btn.style.background = 'var(--danger-color)';
-                
-                setTimeout(() => {
-                    btn.textContent = 'إعادة المحاولة';
-                    btn.style.background = 'var(--accent-color)';
-                    btn.disabled = false;
-                }, 3000);
-            }
-        }
-
-        async function finishSetup() {
-            const loadingScreen = document.getElementById('loadingScreen');
-            const loadingDetails = document.getElementById('loadingDetails');
-            
-            try {
-                loadingDetails.textContent = 'حساب الانحراف المغناطيسي...';
-                await satApp.calculateMagneticDeclination();
-                
-                loadingDetails.textContent = 'تهيئة الكاميرا...';
-                await satApp.getUserMedia();
-                
-                loadingDetails.textContent = 'تهيئة أجهزة الاستشعار...';
-                await satApp.setupSensors();
-                
-                loadingDetails.textContent = 'تحميل الواجهة...';
-                satApp.setupEventListeners();
-                satApp.populateSatelliteList();
-                
-                loadingDetails.textContent = 'مكتمل!';
-                setTimeout(() => {
-                    loadingScreen.style.display = 'none';
-                    satApp.startUpdates();
-                }, 500);
-                
-            } catch (error) {
-                satApp.showError('خطأ في التهيئة', error.message);
-            }
-        }
-
-        // Professional Translation System
-        function t(key, defaultValue = '') {
-            const keys = key.split('.');
-            let value = translations[currentLanguage];
-            
-            for (const k of keys) {
-                value = value?.[k];
-            }
-            
-            return value || defaultValue;
-        }
-
-        function updateTranslations() {
-            document.querySelectorAll('[data-key]').forEach(element => {
-                const key = element.getAttribute('data-key');
-                const translation = t(key);
-                if (translation) {
-                    element.textContent = translation;
-                }
-            });
-        }
-
-        function switchLanguage(lang) {
-            currentLanguage = lang;
-            
-            // Update active language button
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            // Update body direction
-            document.body.className = lang === 'ar' ? 'rtl' : 'ltr';
-            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-            document.documentElement.lang = lang;
-            
-            // Update all translations
-            updateTranslations();
-            
-            // Re-populate satellite list
-            if (satApp?.satellites) {
-                satApp.populateSatelliteList();
-            }
-            
-            // Update satellite info if visible
-            if (satApp?.selectedSatellite) {
-                satApp.updateSatelliteInfo();
-            }
-        }
-
-        // Enhanced Interface Controls
-        function togglePanels() {
-            panelsCollapsed = !panelsCollapsed;
-            const topPanel = document.getElementById('topPanel');
-            const alignmentPanel = document.getElementById('alignmentPanel');
-            const coordDisplay = document.getElementById('coordinatesDisplay');
-            const compassContainer = document.getElementById('compassContainer');
-            const satelliteInfo = document.getElementById('satelliteInfo');
-            const toggleShowBtn = document.getElementById('toggleShowBtn');
-            
-            if (panelsCollapsed) {
-                topPanel.classList.add('collapsed');
-                alignmentPanel.classList.add('collapsed');
-                coordDisplay.classList.add('collapsed');
-                compassContainer.style.opacity = '0.3';
-                satelliteInfo.style.opacity = '0.3';
-                toggleShowBtn.classList.add('visible');
-            } else {
-                topPanel.classList.remove('collapsed');
-                alignmentPanel.classList.remove('collapsed');
-                coordDisplay.classList.remove('collapsed');
-                compassContainer.style.opacity = '1';
-                satelliteInfo.style.opacity = '1';
-                toggleShowBtn.classList.remove('visible');
-            }
-        }
-
-        function showPanels() {
-            panelsCollapsed = false;
-            const topPanel = document.getElementById('topPanel');
-            const alignmentPanel = document.getElementById('alignmentPanel');
-            const coordDisplay = document.getElementById('coordinatesDisplay');
-            const compassContainer = document.getElementById('compassContainer');
-            const satelliteInfo = document.getElementById('satelliteInfo');
-            const toggleShowBtn = document.getElementById('toggleShowBtn');
-            
-            topPanel.classList.remove('collapsed');
-            alignmentPanel.classList.remove('collapsed');
-            coordDisplay.classList.remove('collapsed');
-            compassContainer.style.opacity = '1';
-            satelliteInfo.style.opacity = '1';
-            toggleShowBtn.classList.remove('visible');
-            
-            // Update toggle button state
-            const toggleBtn = document.getElementById('togglePanels');
-            toggleBtn.innerHTML = '<span>▼</span>';
-        }
-
-        // Professional Satellite Application Class
-        class ProfessionalSatelliteFinder {
+        // Global Application State
+        class SatelliteAlignmentApp {
             constructor() {
-                this.initializeElements();
-                this.initializeData();
-                this.initializeState();
-                this.startInitialization();
+                this.currentLanguage = APP_CONFIG.defaultLanguage;
+                this.panelsCollapsed = false;
+                this.permissions = {
+                    camera: false,
+                    location: false,
+                    orientation: false
+                };
+                this.deviceData = {
+                    heading: 0,
+                    tilt: 0,
+                    roll: 0,
+                    calibrationOffset: 0,
+                    isCalibrated: false
+                };
+                this.locationData = {
+                    latitude: null,
+                    longitude: null,
+                    accuracy: null,
+                    magneticDeclination: 0
+                };
+                this.selectedSatellite = null;
+                this.updateInterval = null;
+                this.video = null;
+                this.isInitialized = false;
+
+                // Bind methods
+                this.handleDeviceOrientation = this.handleDeviceOrientation.bind(this);
+                this.handleVisibilityChange = this.handleVisibilityChange.bind(this);
+                this.handleError = this.handleError.bind(this);
+
+                this.initializeApp();
+            }
+
+            // Initialization
+            async initializeApp() {
+                try {
+                    this.log('info', 'Initializing SatAlign Pro Enterprise');
+                    this.initializeElements();
+                    this.setupEventListeners();
+                    await this.checkInitialPermissions();
+                } catch (error) {
+                    this.handleError('initFailed', error);
+                }
             }
 
             initializeElements() {
-                this.video = document.getElementById('video');
-                this.satelliteSelect = document.getElementById('satelliteSelect');
-                this.loadingScreen = document.getElementById('loadingScreen');
-                this.loadingDetails = document.getElementById('loadingDetails');
-                this.permissionButtons = document.getElementById('permissionButtons');
-                this.markersContainer = document.getElementById('satelliteMarkers');
-                this.satelliteInfo = document.getElementById('satelliteInfo');
-            }
-
-            initializeData() {
-                this.satellites = {
-                    'nilesat-201': {
-                        name: { en: 'Nilesat 201', ar: 'نايل سات 201' },
-                        longitude: -7.0,
-                        description: { 
-                            en: 'Primary satellite for Middle East and North Africa',
-                            ar: 'القمر الرئيسي للشرق الأوسط وشمال أفريقيا'
-                        },
-                        frequencies: ['11747 H', '11766 V', '11785 H', '11804 V'],
-                        footprint: { en: 'MENA', ar: 'الشرق الأوسط وشمال أفريقيا' },
-                        power: '8.5 kW',
-                        operator: { en: 'Egyptian Satellite Company', ar: 'الشركة المصرية للأقمار الصناعية' }
-                    },
-                    'nilesat-301': {
-                        name: { en: 'Nilesat 301', ar: 'نايل سات 301' },
-                        longitude: -7.0,
-                        description: { 
-                            en: 'Latest Nilesat with advanced technology',
-                            ar: 'أحدث أقمار نايل سات بتقنية متقدمة'
-                        },
-                        frequencies: ['11823 H', '11842 V', '11861 H', '11880 V'],
-                        footprint: { en: 'MENA', ar: 'الشرق الأوسط وشمال أفريقيا' },
-                        power: '12 kW',
-                        operator: { en: 'Egyptian Satellite Company', ar: 'الشركة المصرية للأقمار الصناعية' }
-                    },
-                    'arabsat-5a': {
-                        name: { en: 'Arabsat 5A', ar: 'عربسات 5A' },
-                        longitude: 30.5,
-                        description: { 
-                            en: 'Covers Middle East and North Africa',
-                            ar: 'يغطي الشرق الأوسط وشمال أفريقيا'
-                        },
-                        frequencies: ['11996 V', '12015 H', '12034 V', '12053 H'],
-                        footprint: { en: 'MENA + Europe', ar: 'الشرق الأوسط وأوروبا' },
-                        power: '10.5 kW',
-                        operator: { en: 'Arabsat', ar: 'عربسات' }
-                    },
-                    'arabsat-5c': {
-                        name: { en: 'Arabsat 5C', ar: 'عربسات 5C' },
-                        longitude: 20.0,
-                        description: { 
-                            en: 'Premium quality services for Arab region',
-                            ar: 'خدمات فائقة الجودة للمنطقة العربية'
-                        },
-                        frequencies: ['11900 V', '11919 H', '11938 V', '11957 H'],
-                        footprint: { en: 'MENA', ar: 'الشرق الأوسط وشمال أفريقيا' },
-                        power: '9.8 kW',
-                        operator: { en: 'Arabsat', ar: 'عربسات' }
-                    },
-                    'badr-4': {
-                        name: { en: 'Badr 4', ar: 'بدر 4' },
-                        longitude: 26.0,
-                        description: { 
-                            en: 'Advanced Arab communications satellite',
-                            ar: 'قمر عربي متقدم للاتصالات'
-                        },
-                        frequencies: ['11996 V', '12015 H', '12034 V'],
-                        footprint: { en: 'MENA + South Asia', ar: 'الشرق الأوسط وجنوب آسيا' },
-                        power: '8.2 kW',
-                        operator: { en: 'Arabsat', ar: 'عربسات' }
-                    },
-                    'badr-5': {
-                        name: { en: 'Badr 5', ar: 'بدر 5' },
-                        longitude: 26.0,
-                        description: { 
-                            en: 'Advanced upgrade to Badr network',
-                            ar: 'تحديث متقدم لشبكة بدر'
-                        },
-                        frequencies: ['12053 H', '12072 V', '12091 H'],
-                        footprint: { en: 'MENA + South Asia', ar: 'الشرق الأوسط وجنوب آسيا' },
-                        power: '9.5 kW',
-                        operator: { en: 'Arabsat', ar: 'عربسات' }
-                    },
-                    'badr-6': {
-                        name: { en: 'Badr 6', ar: 'بدر 6' },
-                        longitude: 26.0,
-                        description: { 
-                            en: 'Latest generation Badr satellite',
-                            ar: 'أحدث جيل من أقمار بدر'
-                        },
-                        frequencies: ['12110 V', '12129 H', '12148 V'],
-                        footprint: { en: 'MENA + South Asia', ar: 'الشرق الأوسط وجنوب آسيا' },
-                        power: '11.2 kW',
-                        operator: { en: 'Arabsat', ar: 'عربسات' }
-                    },
-                    'badr-7': {
-                        name: { en: 'Badr 7', ar: 'بدر 7' },
-                        longitude: 26.0,
-                        description: { 
-                            en: 'Ultra-modern technology',
-                            ar: 'تقنية فائقة الحداثة'
-                        },
-                        frequencies: ['12167 H', '12186 V', '12205 H'],
-                        footprint: { en: 'MENA + South Asia', ar: 'الشرق الأوسط وجنوب آسيا' },
-                        power: '12.5 kW',
-                        operator: { en: 'Arabsat', ar: 'عربسات' }
-                    },
-                    'badr-8': {
-                        name: { en: 'Badr 8', ar: 'بدر 8' },
-                        longitude: 26.0,
-                        description: { 
-                            en: 'Latest addition to Badr fleet',
-                            ar: 'أحدث إضافة لأسطول بدر'
-                        },
-                        frequencies: ['12224 V', '12243 H', '12262 V'],
-                        footprint: { en: 'MENA + South Asia', ar: 'الشرق الأوسط وجنوب آسيا' },
-                        power: '13.8 kW',
-                        operator: { en: 'Arabsat', ar: 'عربسات' }
-                    },
-                    'hotbird-13f': {
-                        name: { en: 'Hotbird 13F', ar: 'هوت بيرد 13F' },
-                        longitude: 13.0,
-                        description: { 
-                            en: 'Primary European satellite',
-                            ar: 'القمر الأوروبي الرئيسي'
-                        },
-                        frequencies: ['10723 H', '10742 V', '10761 H', '10780 V'],
-                        footprint: { en: 'Europe + North Africa', ar: 'أوروبا وشمال أفريقيا' },
-                        power: '15.2 kW',
-                        operator: { en: 'Eutelsat', ar: 'يوتلسات' }
-                    },
-                    'hotbird-13g': {
-                        name: { en: 'Hotbird 13G', ar: 'هوت بيرد 13G' },
-                        longitude: 13.0,
-                        description: { 
-                            en: 'New Hotbird upgrade',
-                            ar: 'تحديث جديد لهوت بيرد'
-                        },
-                        frequencies: ['10799 H', '10818 V', '10837 H', '10856 V'],
-                        footprint: { en: 'Europe + North Africa', ar: 'أوروبا وشمال أفريقيا' },
-                        power: '16.1 kW',
-                        operator: { en: 'Eutelsat', ar: 'يوتلسات' }
-                    },
-                    'astra-1kr': {
-                        name: { en: 'Astra 1KR', ar: 'أسترا 1KR' },
-                        longitude: 19.2,
-                        description: { 
-                            en: 'Advanced European satellite',
-                            ar: 'قمر أوروبي متقدم'
-                        },
-                        frequencies: ['10714 H', '10744 V', '10773 H', '10803 V'],
-                        footprint: { en: 'Europe', ar: 'أوروبا' },
-                        power: '14.8 kW',
-                        operator: { en: 'SES', ar: 'إس إي إس' }
-                    },
-                    'astra-1l': {
-                        name: { en: 'Astra 1L', ar: 'أسترا 1L' },
-                        longitude: 19.2,
-                        description: { 
-                            en: 'Modern Astra satellite',
-                            ar: 'أسترا الحديث'
-                        },
-                        frequencies: ['10832 H', '10862 V', '10891 H', '10920 V'],
-                        footprint: { en: 'Europe', ar: 'أوروبا' },
-                        power: '15.5 kW',
-                        operator: { en: 'SES', ar: 'إس إي إس' }
-                    },
-                    'astra-1m': {
-                        name: { en: 'Astra 1M', ar: 'أسترا 1M' },
-                        longitude: 19.2,
-                        description: { 
-                            en: 'Advanced Astra development',
-                            ar: 'تطوير متقدم لأسترا'
-                        },
-                        frequencies: ['10949 V', '10979 H', '11008 V', '11038 H'],
-                        footprint: { en: 'Europe', ar: 'أوروبا' },
-                        power: '16.2 kW',
-                        operator: { en: 'SES', ar: 'إس إي إس' }
-                    },
-                    'astra-1n': {
-                        name: { en: 'Astra 1N', ar: 'أسترا 1N' },
-                        longitude: 19.2,
-                        description: { 
-                            en: 'Latest Astra satellite',
-                            ar: 'أحدث أقمار أسترا'
-                        },
-                        frequencies: ['11068 V', '11097 H', '11127 V', '11156 H'],
-                        footprint: { en: 'Europe', ar: 'أوروبا' },
-                        power: '17.1 kW',
-                        operator: { en: 'SES', ar: 'إس إي إس' }
-                    },
-                    'eutelsat-16a': {
-                        name: { en: 'Eutelsat 16A', ar: 'يوتلسات 16A' },
-                        longitude: 16.0,
-                        description: { 
-                            en: 'Comprehensive European satellite',
-                            ar: 'قمر أوروبي شامل'
-                        },
-                        frequencies: ['11595 H', '11623 V', '11652 H', '11680 V'],
-                        footprint: { en: 'Europe + Africa', ar: 'أوروبا وأفريقيا' },
-                        power: '13.5 kW',
-                        operator: { en: 'Eutelsat', ar: 'يوتلسات' }
-                    },
-                    'eutelsat-7c': {
-                        name: { en: 'Eutelsat 7C', ar: 'يوتلسات 7C' },
-                        longitude: 7.0,
-                        description: { 
-                            en: 'European and African coverage',
-                            ar: 'تغطية أوروبية وأفريقية'
-                        },
-                        frequencies: ['11304 H', '11332 V', '11360 H', '11389 V'],
-                        footprint: { en: 'Europe + Africa', ar: 'أوروبا وأفريقيا' },
-                        power: '12.8 kW',
-                        operator: { en: 'Eutelsat', ar: 'يوتلسات' }
-                    },
-                    'turksat-4a': {
-                        name: { en: 'Turksat 4A', ar: 'تورك سات 4A' },
-                        longitude: 42.0,
-                        description: { 
-                            en: 'Primary Turkish satellite',
-                            ar: 'القمر التركي الرئيسي'
-                        },
-                        frequencies: ['11957 V', '11975 H', '12034 V', '12053 H'],
-                        footprint: { en: 'Turkey + Europe + MENA', ar: 'تركيا وأوروبا والشرق الأوسط' },
-                        power: '11.8 kW',
-                        operator: { en: 'Turksat', ar: 'تورك سات' }
-                    },
-                    'turksat-4b': {
-                        name: { en: 'Turksat 4B', ar: 'تورك سات 4B' },
-                        longitude: 42.0,
-                        description: { 
-                            en: 'Turksat upgrade',
-                            ar: 'تحديث تورك سات'
-                        },
-                        frequencies: ['12072 V', '12091 H', '12110 V', '12129 H'],
-                        footprint: { en: 'Turkey + Europe + MENA', ar: 'تركيا وأوروبا والشرق الأوسط' },
-                        power: '12.5 kW',
-                        operator: { en: 'Turksat', ar: 'تورك سات' }
-                    },
-                    'hispasat-30w-6': {
-                        name: { en: 'Hispasat 30W-6', ar: 'هيسباسات 30W-6' },
-                        longitude: -30.0,
-                        description: { 
-                            en: 'Advanced Atlantic satellite',
-                            ar: 'قمر أطلسي متقدم'
-                        },
-                        frequencies: ['11876 H', '11934 V', '11992 H', '12051 V'],
-                        footprint: { en: 'Americas + Europe', ar: 'الأمريكتان وأوروبا' },
-                        power: '14.2 kW',
-                        operator: { en: 'Hispasat', ar: 'هيسباسات' }
-                    },
-                    'intelsat-33e': {
-                        name: { en: 'Intelsat 33e', ar: 'إنتلسات 33e' },
-                        longitude: 60.0,
-                        description: { 
-                            en: 'Advanced Asian satellite',
-                            ar: 'قمر آسيوي متطور'
-                        },
-                        frequencies: ['11135 H', '11175 V', '11215 H', '11255 V'],
-                        footprint: { en: 'Asia + MENA', ar: 'آسيا والشرق الأوسط' },
-                        power: '16.8 kW',
-                        operator: { en: 'Intelsat', ar: 'إنتلسات' }
-                    },
-                    'amos-17': {
-                        name: { en: 'Amos 17', ar: 'عاموس 17' },
-                        longitude: 17.0,
-                        description: { 
-                            en: 'Modern Israeli satellite',
-                            ar: 'قمر إسرائيلي حديث'
-                        },
-                        frequencies: ['10843 V', '10883 H', '10923 V', '10963 H'],
-                        footprint: { en: 'Europe + Africa', ar: 'أوروبا وأفريقيا' },
-                        power: '10.5 kW',
-                        operator: { en: 'Spacecom', ar: 'سبيس كوم' }
-                    }
-                };
-            }
-
-            initializeState() {
-                this.userLat = null;
-                this.userLon = null;
-                this.deviceHeading = 0;
-                this.deviceTilt = 0;
-                this.deviceRoll = 0;
-                this.selectedSatellite = null;
-                this.magneticDeclination = 0;
-                this.gpsAccuracy = 0;
-                this.calibrated = false;
-                this.orientationPermission = false;
-                this.cameraPermission = false;
-                this.locationPermission = false;
-                this.updateInterval = null;
-            }
-
-            // Enhanced satellite list population
-            populateSatelliteList() {
-                const select = this.satelliteSelect;
-                select.innerHTML = '';
-                
-                // Add placeholder option
-                const placeholder = document.createElement('option');
-                placeholder.value = '';
-                placeholder.textContent = t('interface.satellite.placeholder', '-- اختر القمر الصناعي --');
-                select.appendChild(placeholder);
-
-                // Group satellites
-                const groups = {
-                    arab: [],
-                    european: [],
-                    other: []
+                this.elements = {
+                    loadingScreen: document.getElementById('loadingScreen'),
+                    loadingDetails: document.getElementById('loadingDetails'),
+                    permissionButtons: document.getElementById('permissionButtons'),
+                    video: document.getElementById('video'),
+                    satelliteSelect: document.getElementById('satelliteSelect'),
+                    satelliteMarkers: document.getElementById('satelliteMarkers'),
+                    satelliteInfo: document.getElementById('satelliteInfo'),
+                    controlPanel: document.getElementById('controlPanel'),
+                    alignmentPanel: document.getElementById('alignmentPanel'),
+                    compassContainer: document.getElementById('compassContainer'),
+                    coordinatesDisplay: document.getElementById('coordinatesDisplay'),
+                    toggleShowBtn: document.getElementById('toggleShowBtn')
                 };
 
-                for (const [key, satellite] of Object.entries(this.satellites)) {
-                    const item = { key, satellite };
-                    
-                    if (['nilesat-201', 'nilesat-301', 'arabsat-5a', 'arabsat-5c', 'badr-4', 'badr-5', 'badr-6', 'badr-7', 'badr-8'].includes(key)) {
-                        groups.arab.push(item);
-                    } else if (['hotbird-13f', 'hotbird-13g', 'astra-1kr', 'astra-1l', 'astra-1m', 'astra-1n', 'eutelsat-16a', 'eutelsat-7c'].includes(key)) {
-                        groups.european.push(item);
-                    } else {
-                        groups.other.push(item);
-                    }
-                }
-
-                // Add Arab satellites group
-                if (groups.arab.length > 0) {
-                    const arabGroup = document.createElement('optgroup');
-                    arabGroup.label = t('satellites.arab', 'الأقمار العربية');
-                    groups.arab.forEach(({ key, satellite }) => {
-                        const option = document.createElement('option');
-                        option.value = key;
-                        option.textContent = `${satellite.name[currentLanguage] || satellite.name.en} (${satellite.longitude}°${satellite.longitude >= 0 ? 'E' : 'W'})`;
-                        arabGroup.appendChild(option);
-                    });
-                    select.appendChild(arabGroup);
-                }
-
-                // Add European satellites group
-                if (groups.european.length > 0) {
-                    const europeanGroup = document.createElement('optgroup');
-                    europeanGroup.label = t('satellites.european', 'الأقمار الأوروبية');
-                    groups.european.forEach(({ key, satellite }) => {
-                        const option = document.createElement('option');
-                        option.value = key;
-                        option.textContent = `${satellite.name[currentLanguage] || satellite.name.en} (${satellite.longitude}°${satellite.longitude >= 0 ? 'E' : 'W'})`;
-                        europeanGroup.appendChild(option);
-                    });
-                    select.appendChild(europeanGroup);
-                }
-
-                // Add other satellites group
-                if (groups.other.length > 0) {
-                    const otherGroup = document.createElement('optgroup');
-                    otherGroup.label = t('satellites.other', 'أقمار أخرى');
-                    groups.other.forEach(({ key, satellite }) => {
-                        const option = document.createElement('option');
-                        option.value = key;
-                        option.textContent = `${satellite.name[currentLanguage] || satellite.name.en} (${satellite.longitude}°${satellite.longitude >= 0 ? 'E' : 'W'})`;
-                        otherGroup.appendChild(option);
-                    });
-                    select.appendChild(otherGroup);
-                }
-            }
-
-            async startInitialization() {
-                try {
-                    this.updateLoadingText('فحص الصلاحيات...');
-                    await this.checkPermissions();
-                    
-                    if (this.cameraPermission && this.locationPermission && this.orientationPermission) {
-                        await this.continueSetup();
-                    }
-                    
-                } catch (error) {
-                    this.showError('خطأ في التهيئة', error.message);
-                }
-            }
-
-            async continueSetup() {
-                this.updateLoadingText('حساب الانحراف المغناطيسي...');
-                await this.calculateMagneticDeclination();
-                
-                this.updateLoadingText('تهيئة الكاميرا...');
-                await this.setupCamera();
-                
-                this.updateLoadingText('تهيئة أجهزة الاستشعار...');
-                await this.setupSensors();
-                
-                this.updateLoadingText('تحميل الواجهة...');
-                this.setupEventListeners();
+                // Generate compass markings
                 this.generateCompassMarkings();
-                this.populateSatelliteList();
                 
-                this.updateLoadingText('مكتمل!');
-                setTimeout(() => {
-                    this.loadingScreen.style.display = 'none';
-                    this.startUpdates();
-                }, 500);
+                // Populate satellite selector
+                this.populateSatelliteSelector();
             }
 
-            updateLoadingText(text) {
-                this.loadingDetails.textContent = text;
+            setupEventListeners() {
+                // Satellite selection
+                this.elements.satelliteSelect.addEventListener('change', (e) => {
+                    this.selectedSatellite = e.target.value;
+                    this.updateSatelliteInfo();
+                });
+
+                // Orientation change
+                window.addEventListener('orientationchange', () => {
+                    setTimeout(() => this.updateDisplay(), 500);
+                });
+
+                // Visibility change for performance
+                document.addEventListener('visibilitychange', this.handleVisibilityChange);
+
+                // Error handling
+                window.addEventListener('error', this.handleError);
+                window.addEventListener('unhandledrejection', this.handleError);
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        this.showPanels();
+                    }
+                });
             }
 
-            async checkPermissions() {
-                if (this.isIOS()) {
-                    this.permissionButtons.style.display = 'block';
-                    this.updateLoadingText('يرجى منح الصلاحيات المطلوبة لتشغيل التطبيق');
-                    return;
+            // Permission Management
+            async checkInitialPermissions() {
+                this.updateLoadingText('Checking device capabilities...');
+                
+                const isIOS = this.isIOSDevice();
+                const isAndroid = this.isAndroidDevice();
+                
+                this.log('info', `Device detected: ${isIOS ? 'iOS' : isAndroid ? 'Android' : 'Other'}`);
+
+                // Skip permission prompt for desktop/modern browsers that handle permissions gracefully
+                if (!isIOS && !isAndroid) {
+                    try {
+                        await this.requestAllPermissions();
+                        await this.completeInitialization();
+                        return;
+                    } catch (error) {
+                        this.log('warn', 'Auto permission request failed, showing manual interface');
+                    }
                 }
 
-                try {
-                    await this.requestAllPermissions();
-                } catch (error) {
-                    this.permissionButtons.style.display = 'block';
-                    this.updateLoadingText('يرجى منح الصلاحيات المطلوبة');
-                }
-            }
-
-            isIOS() {
-                return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                // Show permission interface for mobile devices
+                this.elements.permissionButtons.style.display = 'block';
+                this.updateLoadingText('Please grant the required permissions to continue');
             }
 
             async requestAllPermissions() {
-                await this.getUserMedia();
-                this.cameraPermission = true;
+                // Request camera
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    } 
+                });
+                stream.getTracks().forEach(track => track.stop());
+                this.permissions.camera = true;
 
-                await this.getUserLocation();
-                this.locationPermission = true;
+                // Request location
+                await this.getCurrentLocation();
+                this.permissions.location = true;
 
-                this.orientationPermission = true;
+                // Request orientation (iOS requires explicit permission)
+                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    const permission = await DeviceOrientationEvent.requestPermission();
+                    if (permission !== 'granted') {
+                        throw new Error('Orientation permission denied');
+                    }
+                }
+                this.permissions.orientation = true;
+
+                return true;
             }
 
-            async getUserLocation() {
+            // Location Services
+            async getCurrentLocation() {
                 return new Promise((resolve, reject) => {
                     if (!navigator.geolocation) {
-                        reject(new Error('خدمة تحديد الموقع غير متوفرة'));
+                        reject(new Error('Geolocation not supported'));
                         return;
                     }
 
+                    const options = {
+                        enableHighAccuracy: true,
+                        timeout: 15000,
+                        maximumAge: 300000
+                    };
+
                     navigator.geolocation.getCurrentPosition(
                         (position) => {
-                            this.userLat = position.coords.latitude;
-                            this.userLon = position.coords.longitude;
-                            this.gpsAccuracy = Math.round(position.coords.accuracy);
-                            document.getElementById('gpsAccuracy').textContent = this.gpsAccuracy + 'm';
+                            this.locationData.latitude = position.coords.latitude;
+                            this.locationData.longitude = position.coords.longitude;
+                            this.locationData.accuracy = Math.round(position.coords.accuracy);
                             
-                            // Update coordinates display
-                            document.getElementById('coordLat').textContent = this.userLat.toFixed(6) + '°';
-                            document.getElementById('coordLon').textContent = this.userLon.toFixed(6) + '°';
-                            
-                            resolve();
+                            this.updateLocationDisplay();
+                            resolve(position);
                         },
                         (error) => {
-                            let message = 'فشل في تحديد الموقع';
+                            let message = 'Failed to determine location';
                             switch(error.code) {
                                 case error.PERMISSION_DENIED:
-                                    message = 'تم رفض صلاحية الموقع';
+                                    message = 'Location permission denied';
                                     break;
                                 case error.POSITION_UNAVAILABLE:
-                                    message = 'الموقع غير متوفر';
+                                    message = 'Location unavailable';
                                     break;
                                 case error.TIMEOUT:
-                                    message = 'انتهت مهلة تحديد الموقع';
+                                    message = 'Location timeout';
                                     break;
                             }
                             reject(new Error(message));
                         },
-                        { 
-                            enableHighAccuracy: true, 
-                            timeout: 15000, 
-                            maximumAge: 300000 
-                        }
+                        options
                     );
                 });
             }
 
+            // Magnetic Declination Calculation
             async calculateMagneticDeclination() {
-                const lat = this.userLat;
-                const lon = this.userLon;
+                if (!this.locationData.latitude || !this.locationData.longitude) {
+                    return;
+                }
+
+                const lat = this.locationData.latitude;
+                const lon = this.locationData.longitude;
                 
-                // Enhanced magnetic declination calculation
+                // Enhanced IGRF-13 based calculation
                 const year = new Date().getFullYear();
-                
-                // Calculate day of year correctly
-                const now = new Date();
-                const start = new Date(now.getFullYear(), 0, 0);
-                const diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
-                const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const dayOfYear = Math.floor((Date.now() - new Date(year, 0, 0)) / 86400000);
                 const decimalYear = year + (dayOfYear - 1) / 365;
                 
-                // Professional IGRF-13 simplified model
                 const latRad = lat * Math.PI / 180;
                 const lonRad = lon * Math.PI / 180;
                 
-                // Enhanced calculation using multiple harmonic terms
+                // Multi-term harmonic calculation
                 const term1 = Math.sin(latRad) * Math.cos(lonRad) * 12.5;
                 const term2 = Math.cos(latRad) * Math.sin(lonRad) * 8.3;
                 const term3 = Math.sin(2 * latRad) * 3.2;
                 const term4 = Math.cos(2 * lonRad) * 1.8;
+                const term5 = Math.sin(3 * latRad) * Math.cos(lonRad) * 1.2;
                 
-                // Secular variation (annual change)
+                // Secular variation
                 const secularVariation = (decimalYear - 2020) * 0.05;
                 
-                this.magneticDeclination = term1 + term2 + term3 + term4 + secularVariation;
-                this.magneticDeclination = Math.round(this.magneticDeclination * 10) / 10;
+                this.locationData.magneticDeclination = term1 + term2 + term3 + term4 + term5 + secularVariation;
+                this.locationData.magneticDeclination = Math.max(-30, Math.min(30, this.locationData.magneticDeclination));
                 
-                // Ensure reasonable bounds (-30° to +30°)
-                this.magneticDeclination = Math.max(-30, Math.min(30, this.magneticDeclination));
-                
-                document.getElementById('magneticDeclination').textContent = this.magneticDeclination.toFixed(1) + '°';
+                document.getElementById('magneticDeclination').textContent = 
+                    this.locationData.magneticDeclination.toFixed(1) + '°';
             }
 
+            // Camera Setup
             async setupCamera() {
-                if (!this.cameraPermission) {
-                    throw new Error('لم يتم منح صلاحية الكاميرا');
-                }
-
-                return this.getUserMedia();
-            }
-
-            async getUserMedia() {
                 try {
                     const constraints = {
                         video: {
@@ -2013,139 +2083,158 @@
                     };
 
                     const stream = await navigator.mediaDevices.getUserMedia(constraints);
-                    this.video.srcObject = stream;
+                    this.elements.video.srcObject = stream;
+                    this.video = this.elements.video;
                     
                     return new Promise((resolve) => {
                         this.video.onloadedmetadata = () => {
+                            this.log('info', 'Camera initialized successfully');
                             resolve();
                         };
                     });
                 } catch (error) {
-                    throw new Error('فشل في تشغيل الكاميرا: ' + error.message);
+                    throw new Error(`Camera setup failed: ${error.message}`);
                 }
             }
 
-            async setupSensors() {
-                if (!this.orientationPermission) {
-                    throw new Error('لا توجد صلاحية لأجهزة الاستشعار');
+            // Sensor Setup
+            setupSensors() {
+                if (window.DeviceOrientationEvent) {
+                    window.addEventListener('deviceorientation', this.handleDeviceOrientation);
+                    this.startCalibration();
+                    this.log('info', 'Sensors initialized successfully');
+                } else {
+                    throw new Error('Device orientation not supported');
                 }
+            }
 
-                window.addEventListener('deviceorientation', (event) => {
-                    if (event.alpha !== null) {
-                        this.deviceHeading = (event.alpha + this.magneticDeclination + 360) % 360;
-                    }
-                    if (event.beta !== null) {
-                        this.deviceTilt = event.beta;
-                    }
-                    if (event.gamma !== null) {
-                        this.deviceRoll = event.gamma;
+            handleDeviceOrientation(event) {
+                if (event.alpha !== null) {
+                    // Fix for Android: Convert compass heading correctly
+                    let heading = event.alpha;
+                    
+                    // Apply magnetic declination correction
+                    heading = (heading + this.locationData.magneticDeclination + 360) % 360;
+                    
+                    // Apply calibration offset
+                    if (this.deviceData.isCalibrated) {
+                        heading = (heading + this.deviceData.calibrationOffset + 360) % 360;
                     }
                     
-                    this.updateSensorDisplay();
-                });
-
-                this.startCalibration();
+                    this.deviceData.heading = heading;
+                }
+                
+                if (event.beta !== null) {
+                    this.deviceData.tilt = event.beta;
+                }
+                
+                if (event.gamma !== null) {
+                    this.deviceData.roll = event.gamma;
+                }
+                
+                this.updateSensorDisplay();
             }
 
             startCalibration() {
-                let calibrationSamples = [];
+                let samples = [];
                 let sampleCount = 0;
+                const maxSamples = 20;
                 
                 const calibrationInterval = setInterval(() => {
-                    if (this.deviceHeading !== 0) {
-                        calibrationSamples.push(this.deviceHeading);
+                    if (this.deviceData.heading !== 0 && sampleCount < maxSamples) {
+                        samples.push(this.deviceData.heading);
                         sampleCount++;
-                        
-                        if (sampleCount >= 10) {
-                            const average = calibrationSamples.reduce((a, b) => a + b) / calibrationSamples.length;
-                            this.calibrationOffset = average - this.deviceHeading;
-                            this.calibrated = true;
-                            clearInterval(calibrationInterval);
-                        }
                     }
-                }, 100);
+                    
+                    if (sampleCount >= maxSamples) {
+                        // Calculate median for more stable calibration
+                        samples.sort((a, b) => a - b);
+                        const median = samples[Math.floor(samples.length / 2)];
+                        
+                        // Apply compass rose correction (North should be 0°)
+                        this.deviceData.calibrationOffset = (360 - median) % 360;
+                        this.deviceData.isCalibrated = true;
+                        
+                        this.log('info', `Compass calibrated with offset: ${this.deviceData.calibrationOffset.toFixed(1)}°`);
+                        clearInterval(calibrationInterval);
+                    }
+                }, 200);
+                
+                // Timeout after 10 seconds
+                setTimeout(() => {
+                    if (!this.deviceData.isCalibrated) {
+                        this.deviceData.isCalibrated = true;
+                        this.log('warn', 'Compass calibration timed out, using default');
+                        clearInterval(calibrationInterval);
+                    }
+                }, 10000);
+            }
+
+            // UI Management
+            populateSatelliteSelector() {
+                const select = this.elements.satelliteSelect;
+                select.innerHTML = '';
+                
+                // Add placeholder
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.textContent = this.t('interface.satellite.placeholder', '-- Select Satellite --');
+                select.appendChild(placeholder);
+
+                // Group satellites
+                const groups = {
+                    arab: ['nilesat-201', 'nilesat-301', 'arabsat-5a', 'arabsat-5c', 'badr-6', 'badr-7'],
+                    european: ['hotbird-13f', 'hotbird-13g', 'astra-1kr', 'astra-1l', 'eutelsat-16a'],
+                    other: ['turksat-4a', 'turksat-4b', 'hispasat-30w-6', 'intelsat-33e', 'amos-17']
+                };
+
+                // Add grouped options
+                Object.entries(groups).forEach(([groupKey, satelliteKeys]) => {
+                    if (satelliteKeys.length === 0) return;
+                    
+                    const group = document.createElement('optgroup');
+                    group.label = this.t(`satellites.${groupKey}`, groupKey);
+                    
+                    satelliteKeys.forEach(key => {
+                        if (SATELLITE_DATABASE[key]) {
+                            const satellite = SATELLITE_DATABASE[key];
+                            const option = document.createElement('option');
+                            option.value = key;
+                            const name = satellite.name[this.currentLanguage] || satellite.name.en;
+                            const pos = satellite.longitude >= 0 ? `${satellite.longitude}°E` : `${Math.abs(satellite.longitude)}°W`;
+                            option.textContent = `${name} (${pos})`;
+                            group.appendChild(option);
+                        }
+                    });
+                    
+                    select.appendChild(group);
+                });
             }
 
             generateCompassMarkings() {
-                const markingsContainer = document.querySelector('.compass-markings');
-                markingsContainer.innerHTML = '';
+                const container = document.getElementById('compassMarkings');
+                container.innerHTML = '';
                 
                 for (let i = 0; i < 360; i += 15) {
                     const mark = document.createElement('div');
                     mark.className = i % 45 === 0 ? 'compass-mark major' : 'compass-mark';
                     mark.style.transform = `translateX(-50%) rotate(${i}deg)`;
-                    markingsContainer.appendChild(mark);
+                    container.appendChild(mark);
                 }
             }
 
-            updateSensorDisplay() {
-                document.getElementById('deviceHeading').textContent = this.deviceHeading.toFixed(0) + '°';
-                document.getElementById('deviceTilt').textContent = this.deviceTilt.toFixed(0) + '°';
-                
-                const needle = document.getElementById('compassNeedle');
-                needle.style.transform = `translateX(-50%) rotate(${this.deviceHeading}deg)`;
-                
-                const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
-                const directionIndex = Math.round(this.deviceHeading / 22.5) % 16;
-                document.getElementById('compassDirection').textContent = directions[directionIndex];
-            }
-
-            setupEventListeners() {
-                this.satelliteSelect.addEventListener('change', () => {
-                    this.selectedSatellite = this.satelliteSelect.value;
-                    this.updateSatelliteInfo();
-                });
-
-                window.addEventListener('orientationchange', () => {
-                    setTimeout(() => {
-                        this.updateDisplay();
-                    }, 500);
-                });
-
-                // Continuous updates
-                this.updateInterval = setInterval(() => {
-                    this.updateDisplay();
-                }, 100);
-            }
-
-            startUpdates() {
-                this.updateDisplay();
-            }
-
-            updateSatelliteInfo() {
-                if (!this.selectedSatellite) {
-                    this.satelliteInfo.classList.remove('visible');
-                    return;
+            // Satellite Calculations
+            calculateSatellitePosition(satelliteLongitude) {
+                if (!this.locationData.latitude || !this.locationData.longitude) {
+                    return null;
                 }
 
-                const satellite = this.satellites[this.selectedSatellite];
-                const satName = satellite.name[currentLanguage] || satellite.name.en;
-                const satDesc = satellite.description[currentLanguage] || satellite.description.en;
-                const satFootprint = satellite.footprint[currentLanguage] || satellite.footprint.en;
-                const satOperator = satellite.operator[currentLanguage] || satellite.operator.en;
-                
-                document.getElementById('satName').textContent = satName;
-                document.getElementById('satDetails').innerHTML = `
-                    <strong>خط الطول:</strong> ${satellite.longitude}°<br>
-                    <strong>الوصف:</strong> ${satDesc}<br>
-                    <strong>التغطية:</strong> ${satFootprint}<br>
-                    <strong>المشغل:</strong> ${satOperator}<br>
-                    <strong>القدرة:</strong> ${satellite.power}<br>
-                    <strong>ترددات عينة:</strong><br>
-                    ${satellite.frequencies.slice(0, 3).join('<br>')}
-                `;
-                this.satelliteInfo.classList.add('visible');
-            }
-
-            calculatePreciseSatellitePosition(satLongitude) {
-                if (!this.userLat || !this.userLon) return null;
-
-                const userLatRad = this.userLat * Math.PI / 180;
-                const userLonRad = this.userLon * Math.PI / 180;
-                const satLonRad = satLongitude * Math.PI / 180;
+                const userLatRad = this.locationData.latitude * Math.PI / 180;
+                const userLonRad = this.locationData.longitude * Math.PI / 180;
+                const satLonRad = satelliteLongitude * Math.PI / 180;
                 const deltaLon = satLonRad - userLonRad;
 
-                // Precise geostationary orbit calculations
+                // Geostationary orbit calculations
                 const earthRadius = 6371000; // meters
                 const satAltitude = 35786000; // meters  
                 const satRadius = earthRadius + satAltitude;
@@ -2155,22 +2244,17 @@
                 const cosDeltaLon = Math.cos(deltaLon);
                 const sinDeltaLon = Math.sin(deltaLon);
 
-                // Calculate azimuth with high precision
+                // Calculate azimuth (corrected for proper direction)
                 const azimuthRad = Math.atan2(sinDeltaLon, cosUserLat * Math.tan(0) - sinUserLat * cosDeltaLon);
                 let azimuth = (azimuthRad * 180 / Math.PI + 360) % 360;
 
-                // Correction for southern hemisphere
-                if (this.userLat < 0) {
-                    azimuth = (180 - azimuth + 360) % 360;
-                }
-
-                // Calculate elevation with high precision
+                // Elevation calculation
                 const groundDistance = earthRadius * Math.acos(sinUserLat * Math.sin(0) + cosUserLat * Math.cos(0) * cosDeltaLon);
                 const slantRange = Math.sqrt(Math.pow(satRadius, 2) + Math.pow(earthRadius, 2) - 2 * satRadius * earthRadius * Math.cos(groundDistance / earthRadius));
                 const elevationRad = Math.asin((satRadius * Math.sin(groundDistance / earthRadius)) / slantRange) - (groundDistance / earthRadius);
                 const elevation = Math.max(0, elevationRad * 180 / Math.PI);
 
-                // Calculate LNB skew/polarization angle
+                // LNB skew calculation
                 const skewRad = Math.atan2(sinDeltaLon * sinUserLat, Math.cos(0) * cosUserLat - Math.sin(0) * sinUserLat * cosDeltaLon);
                 const skew = skewRad * 180 / Math.PI;
 
@@ -2184,50 +2268,51 @@
                 };
             }
 
+            // Display Updates
             updateDisplay() {
-                if (!this.selectedSatellite || !this.userLat) {
+                if (!this.selectedSatellite || !this.locationData.latitude) {
                     this.updateAlignmentStatus(
-                        t('status.searching', 'البحث عن القمر الصناعي'),
-                        t('status.instructions', 'اختر قمر صناعي من الأعلى للبدء'), 
+                        this.t('status.searching', 'Searching for Satellite'),
+                        this.t('status.instructions', 'Select a satellite from above to begin'), 
                         0
                     );
                     return;
                 }
 
-                const satellite = this.satellites[this.selectedSatellite];
-                const position = this.calculatePreciseSatellitePosition(satellite.longitude);
+                const satellite = SATELLITE_DATABASE[this.selectedSatellite];
+                const position = this.calculateSatellitePosition(satellite.longitude);
 
                 if (!position || !position.valid) {
                     this.updateAlignmentStatus(
-                        'القمر الصناعي غير مرئي',
-                        'القمر الصناعي تحت الأفق من موقعك', 
+                        'Satellite Not Visible',
+                        'Satellite is below horizon from your location', 
                         0
                     );
                     return;
                 }
 
-                // Update displayed values
-                document.getElementById('azimuth').textContent = position.azimuth.toFixed(1) + '°';
-                document.getElementById('elevation').textContent = position.elevation.toFixed(1) + '°';
-                document.getElementById('skew').textContent = position.skew.toFixed(1) + '°';
+                // Update metrics display
+                document.getElementById('azimuth').innerHTML = `${position.azimuth.toFixed(1)}<span class="metric-unit">°</span>`;
+                document.getElementById('elevation').innerHTML = `${position.elevation.toFixed(1)}<span class="metric-unit">°</span>`;
+                document.getElementById('skew').innerHTML = `${position.skew.toFixed(1)}<span class="metric-unit">°</span>`;
                 document.getElementById('coordDistance').textContent = position.distance + ' km';
 
-                // Calculate alignment precision
-                const angleDiff = this.calculateAngleDifference(this.deviceHeading, position.azimuth);
-                const tiltDiff = Math.abs(this.deviceTilt - position.elevation);
+                // Calculate alignment precision with corrected directions
+                const headingDiff = this.calculateAngleDifference(this.deviceData.heading, position.azimuth);
+                const tiltDiff = Math.abs(this.deviceData.tilt - position.elevation);
                 
-                const azimuthAccuracy = Math.max(0, 100 - (angleDiff * 2));
+                const azimuthAccuracy = Math.max(0, 100 - (headingDiff * 2));
                 const elevationAccuracy = Math.max(0, 100 - (tiltDiff * 4));
                 const overallAccuracy = (azimuthAccuracy + elevationAccuracy) / 2;
 
                 this.updateAlignmentStatus(
                     this.getAlignmentStatusText(overallAccuracy),
-                    this.getAlignmentDetails(angleDiff, tiltDiff, position),
+                    this.getAlignmentDetails(headingDiff, tiltDiff, position),
                     overallAccuracy
                 );
 
-                // Draw professional satellite marker
-                this.drawProfessionalSatelliteMarker(position, angleDiff, elevationAccuracy);
+                // Draw satellite marker
+                this.drawSatelliteMarker(position, headingDiff, elevationAccuracy);
             }
 
             calculateAngleDifference(angle1, angle2) {
@@ -2236,36 +2321,37 @@
             }
 
             getAlignmentStatusText(accuracy) {
-                if (accuracy >= 95) return t('status.perfect', 'توجيه مثالي محقق');
-                if (accuracy >= 85) return t('status.excellent', 'توجيه ممتاز');
-                if (accuracy >= 70) return t('status.good', 'توجيه جيد');
-                if (accuracy >= 50) return t('status.fair', 'توجيه متوسط');
-                if (accuracy >= 30) return t('status.poor', 'توجيه ضعيف');
-                return t('status.none', 'لا يوجد توجيه');
+                if (accuracy >= 95) return this.t('status.perfect', 'Perfect Alignment Achieved');
+                if (accuracy >= 85) return this.t('status.excellent', 'Excellent Alignment');
+                if (accuracy >= 70) return this.t('status.good', 'Good Alignment');
+                if (accuracy >= 50) return this.t('status.fair', 'Fair Alignment');
+                if (accuracy >= 30) return this.t('status.poor', 'Poor Alignment');
+                return this.t('status.none', 'No Alignment');
             }
 
-            getAlignmentDetails(angleDiff, tiltDiff, position) {
+            getAlignmentDetails(headingDiff, tiltDiff, position) {
                 let details = [];
                 
-                if (angleDiff > 2) {
-                    const direction = this.deviceHeading < position.azimuth ? 
-                        t('alignment.turnRight', 'استدر يميناً') : 
-                        t('alignment.turnLeft', 'استدر يساراً');
-                    details.push(`${direction} ${Math.round(angleDiff)}°`);
+                // Corrected direction logic
+                if (headingDiff > 2) {
+                    const direction = this.deviceData.heading < position.azimuth ? 
+                        this.t('alignment.turnRight', 'Turn right') : 
+                        this.t('alignment.turnLeft', 'Turn left');
+                    details.push(`${direction} ${Math.round(headingDiff)}°`);
                 }
                 
                 if (tiltDiff > 1) {
-                    const direction = this.deviceTilt < position.elevation ? 
-                        t('alignment.tiltUp', 'اتجه للأعلى') : 
-                        t('alignment.tiltDown', 'اتجه للأسفل');
+                    const direction = this.deviceData.tilt < position.elevation ? 
+                        this.t('alignment.tiltUp', 'Tilt up') : 
+                        this.t('alignment.tiltDown', 'Tilt down');
                     details.push(`${direction} ${Math.round(tiltDiff)}°`);
                 }
                 
                 if (details.length === 0) {
-                    details.push(t('alignment.perfect', 'الطبق موجه بشكل مثالي نحو القمر الصناعي'));
+                    details.push(this.t('alignment.perfect', 'Dish is perfectly aligned with satellite'));
                 }
                 
-                details.push(`${t('alignment.distance', 'المسافة')}: ${position.distance} km`);
+                details.push(`${this.t('alignment.distance', 'Distance')}: ${position.distance} km`);
                 
                 return details.join(' • ');
             }
@@ -2278,13 +2364,66 @@
                 const signalText = document.getElementById('signalText');
                 
                 signalBar.style.width = accuracy + '%';
-                signalText.textContent = `${t('status.precision', 'دقة التوجيه')}: ${Math.round(accuracy)}%`;
+                signalText.textContent = `${this.t('status.precision', 'Alignment Precision')}: ${Math.round(accuracy)}%`;
             }
 
-            drawProfessionalSatelliteMarker(position, angleDiff, elevationAccuracy) {
-                this.markersContainer.innerHTML = '';
+            updateSensorDisplay() {
+                // Update display values
+                document.getElementById('deviceHeading').innerHTML = 
+                    `${this.deviceData.heading.toFixed(0)}°<span class="status-indicator ${this.deviceData.isCalibrated ? 'good' : ''}" id="headingIndicator"></span>`;
+                document.getElementById('deviceTilt').innerHTML = 
+                    `${this.deviceData.tilt.toFixed(0)}°<span class="status-indicator ${Math.abs(this.deviceData.tilt) < 45 ? 'good' : 'warning'}" id="tiltIndicator"></span>`;
+                
+                // Update compass
+                const needle = document.getElementById('compassNeedle');
+                needle.style.transform = `translateX(-50%) rotate(${this.deviceData.heading}deg)`;
+                
+                // Update compass direction
+                const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+                const directionIndex = Math.round(this.deviceData.heading / 22.5) % 16;
+                document.getElementById('compassDirection').textContent = directions[directionIndex];
+            }
 
-                if (angleDiff < 90 && elevationAccuracy > 10) {
+            updateLocationDisplay() {
+                if (this.locationData.latitude && this.locationData.longitude) {
+                    document.getElementById('coordLat').textContent = this.locationData.latitude.toFixed(6) + '°';
+                    document.getElementById('coordLon').textContent = this.locationData.longitude.toFixed(6) + '°';
+                    document.getElementById('gpsAccuracy').innerHTML = 
+                        `${this.locationData.accuracy}m<span class="status-indicator ${this.locationData.accuracy < 20 ? 'good' : this.locationData.accuracy < 50 ? 'warning' : ''}" id="gpsIndicator"></span>`;
+                }
+            }
+
+            updateSatelliteInfo() {
+                if (!this.selectedSatellite) {
+                    this.elements.satelliteInfo.classList.remove('visible');
+                    return;
+                }
+
+                const satellite = SATELLITE_DATABASE[this.selectedSatellite];
+                const satName = satellite.name[this.currentLanguage] || satellite.name.en;
+                const satDesc = satellite.description[this.currentLanguage] || satellite.description.en;
+                const satFootprint = satellite.footprint[this.currentLanguage] || satellite.footprint.en;
+                const satOperator = satellite.operator[this.currentLanguage] || satellite.operator.en;
+                
+                document.querySelector('#satName span').textContent = satName;
+                document.getElementById('satDetails').innerHTML = `
+                    <strong>Longitude:</strong> ${satellite.orbital_position}<br>
+                    <strong>Description:</strong> ${satDesc}<br>
+                    <strong>Coverage:</strong> ${satFootprint}<br>
+                    <strong>Operator:</strong> ${satOperator}<br>
+                    <strong>Power:</strong> ${satellite.power}<br>
+                    <strong>Launched:</strong> ${satellite.launched}<br>
+                    <strong>Transponders:</strong> ${satellite.transponders}<br>
+                    <strong>Sample Frequencies:</strong><br>
+                    ${satellite.frequencies.slice(0, 3).join('<br>')}
+                `;
+                this.elements.satelliteInfo.classList.add('visible');
+            }
+
+            drawSatelliteMarker(position, headingDiff, elevationAccuracy) {
+                this.elements.satelliteMarkers.innerHTML = '';
+
+                if (headingDiff < 90 && elevationAccuracy > 10) {
                     const marker = document.createElement('div');
                     marker.className = 'satellite-marker';
 
@@ -2294,7 +2433,14 @@
                     const markerCircle = document.createElement('div');
                     markerCircle.className = 'marker-circle';
 
-                    // Professional satellite icon
+                    // Determine marker status
+                    if (headingDiff < 2 && elevationAccuracy > 95) {
+                        markerCircle.classList.add('aligned');
+                    } else if (headingDiff < 5 && elevationAccuracy > 80) {
+                        markerCircle.classList.add('close');
+                    }
+
+                    // Satellite icon
                     const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
                     icon.setAttribute('class', 'marker-icon');
                     icon.setAttribute('viewBox', '0 0 24 24');
@@ -2307,60 +2453,337 @@
                     `;
                     markerCircle.appendChild(icon);
 
-                    // Determine marker color based on precision
-                    if (angleDiff < 2 && elevationAccuracy > 95) {
-                        markerCircle.classList.add('aligned');
-                    } else if (angleDiff < 5 && elevationAccuracy > 80) {
-                        markerCircle.classList.add('close');
-                    }
-
                     const label = document.createElement('div');
                     label.className = 'marker-label';
-                    const satellite = this.satellites[this.selectedSatellite];
-                    label.textContent = satellite.name[currentLanguage] || satellite.name.en;
+                    const satellite = SATELLITE_DATABASE[this.selectedSatellite];
+                    label.textContent = satellite.name[this.currentLanguage] || satellite.name.en;
 
                     markerContainer.appendChild(markerCircle);
                     markerContainer.appendChild(label);
                     marker.appendChild(markerContainer);
 
-                    // Calculate marker position on screen
+                    // Calculate marker position (corrected for camera mirroring)
                     const screenWidth = window.innerWidth;
                     const screenHeight = window.innerHeight;
 
-                    const relativeAzimuth = position.azimuth - this.deviceHeading;
-                    const relativeElevation = position.elevation - this.deviceTilt;
+                    const relativeAzimuth = position.azimuth - this.deviceData.heading;
+                    const relativeElevation = position.elevation - this.deviceData.tilt;
 
-                    // Convert relative angles to screen coordinates
-                    const x = screenWidth / 2 + (relativeAzimuth * screenWidth / 90);
+                    // Convert to screen coordinates (account for mirrored camera)
+                    const x = screenWidth / 2 - (relativeAzimuth * screenWidth / 90); // Inverted X for mirrored camera
                     const y = screenHeight / 2 - (relativeElevation * screenHeight / 90);
 
-                    // Ensure marker stays within screen bounds
+                    // Clamp to screen bounds
                     const clampedX = Math.max(80, Math.min(screenWidth - 80, x));
                     const clampedY = Math.max(120, Math.min(screenHeight - 120, y));
 
                     marker.style.left = clampedX + 'px';
                     marker.style.top = clampedY + 'px';
 
-                    this.markersContainer.appendChild(marker);
+                    this.elements.satelliteMarkers.appendChild(marker);
                 }
             }
 
-            showError(title, message) {
-                const errorDialog = document.createElement('div');
-                errorDialog.className = 'error-dialog';
-                errorDialog.innerHTML = `
-                    <div class="error-title">${title}</div>
-                    <div class="error-message">${message}</div>
-                `;
-                document.body.appendChild(errorDialog);
-
-                setTimeout(() => {
-                    if (errorDialog.parentNode) {
-                        errorDialog.parentNode.removeChild(errorDialog);
-                    }
-                }, 5000);
+            // Interface Controls
+            togglePanels() {
+                this.panelsCollapsed = !this.panelsCollapsed;
+                
+                const panels = [
+                    this.elements.controlPanel,
+                    this.elements.alignmentPanel,
+                    this.elements.coordinatesDisplay
+                ];
+                
+                const compass = this.elements.compassContainer;
+                const satelliteInfo = this.elements.satelliteInfo;
+                const toggleBtn = this.elements.toggleShowBtn;
+                
+                if (this.panelsCollapsed) {
+                    panels.forEach(panel => panel.classList.add('collapsed'));
+                    compass.style.opacity = '0.3';
+                    satelliteInfo.style.opacity = '0.3';
+                    toggleBtn.classList.add('visible');
+                } else {
+                    panels.forEach(panel => panel.classList.remove('collapsed'));
+                    compass.style.opacity = '1';
+                    satelliteInfo.style.opacity = '1';
+                    toggleBtn.classList.remove('visible');
+                }
+                
+                // Update toggle button text
+                const togglePanelsBtn = document.getElementById('togglePanels');
+                togglePanelsBtn.innerHTML = this.panelsCollapsed ? '<span>▲</span>' : '<span>▼</span>';
             }
 
+            showPanels() {
+                if (this.panelsCollapsed) {
+                    this.togglePanels();
+                }
+            }
+
+            // Language Management
+            switchLanguage(lang) {
+                if (!APP_CONFIG.supportedLanguages.includes(lang)) {
+                    this.log('warn', `Unsupported language: ${lang}`);
+                    return;
+                }
+
+                this.currentLanguage = lang;
+                
+                // Update active language button
+                document.querySelectorAll('.lang-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                event.target.classList.add('active');
+                
+                // Update document language and direction
+                document.documentElement.lang = lang;
+                document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+                document.body.className = lang === 'ar' ? 'rtl' : 'ltr';
+                
+                // Update all translations
+                this.updateTranslations();
+                
+                // Re-populate satellite list
+                this.populateSatelliteSelector();
+                
+                // Update satellite info if visible
+                if (this.selectedSatellite) {
+                    this.updateSatelliteInfo();
+                }
+
+                // Store language preference
+                try {
+                    localStorage.setItem('satalign_language', lang);
+                } catch (e) {
+                    this.log('warn', 'Could not save language preference');
+                }
+            }
+
+            updateTranslations() {
+                document.querySelectorAll('[data-key]').forEach(element => {
+                    const key = element.getAttribute('data-key');
+                    const translation = this.t(key);
+                    if (translation) {
+                        element.textContent = translation;
+                    }
+                });
+            }
+
+            // Translation helper
+            t(key, fallback = '') {
+                const keys = key.split('.');
+                let value = TRANSLATIONS[this.currentLanguage];
+                
+                for (const k of keys) {
+                    value = value?.[k];
+                    if (!value) break;
+                }
+                
+                return value || fallback || key;
+            }
+
+            // Initialization completion
+            async completeInitialization() {
+                try {
+                    this.updateLoadingText('Calculating magnetic declination...');
+                    await this.calculateMagneticDeclination();
+                    
+                    this.updateLoadingText('Initializing camera...');
+                    await this.setupCamera();
+                    
+                    this.updateLoadingText('Setting up sensors...');
+                    this.setupSensors();
+                    
+                    this.updateLoadingText('Loading interface...');
+                    await this.delay(500); // Allow UI to settle
+                    
+                    this.updateLoadingText('Complete!');
+                    await this.delay(500);
+                    
+                    this.elements.loadingScreen.style.display = 'none';
+                    this.startMainLoop();
+                    this.isInitialized = true;
+                    
+                    this.log('info', 'Application initialized successfully');
+                    
+                    // Send telemetry if enabled
+                    if (APP_CONFIG.telemetry.enabled) {
+                        this.sendTelemetry('app_initialized', {
+                            version: APP_CONFIG.version,
+                            language: this.currentLanguage,
+                            device: this.getDeviceInfo()
+                        });
+                    }
+                    
+                } catch (error) {
+                    this.handleError('initFailed', error);
+                }
+            }
+
+            startMainLoop() {
+                // Main update loop
+                this.updateInterval = setInterval(() => {
+                    if (this.isInitialized) {
+                        this.updateDisplay();
+                    }
+                }, 100);
+
+                // Slower updates for UI elements
+                setInterval(() => {
+                    if (this.isInitialized) {
+                        this.updateLocationDisplay();
+                    }
+                }, 1000);
+            }
+
+            // Utility functions
+            updateLoadingText(text) {
+                if (this.elements.loadingDetails) {
+                    this.elements.loadingDetails.textContent = text;
+                }
+            }
+
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            isIOSDevice() {
+                return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            }
+
+            isAndroidDevice() {
+                return /Android/.test(navigator.userAgent);
+            }
+
+            getDeviceInfo() {
+                return {
+                    userAgent: navigator.userAgent,
+                    platform: navigator.platform,
+                    language: navigator.language,
+                    screenWidth: window.screen.width,
+                    screenHeight: window.screen.height,
+                    devicePixelRatio: window.devicePixelRatio,
+                    isIOS: this.isIOSDevice(),
+                    isAndroid: this.isAndroidDevice()
+                };
+            }
+
+            // Event handlers
+            handleVisibilityChange() {
+                if (document.hidden) {
+                    // Pause updates when app is hidden
+                    if (this.updateInterval) {
+                        clearInterval(this.updateInterval);
+                        this.updateInterval = null;
+                    }
+                } else {
+                    // Resume updates when app becomes visible
+                    if (!this.updateInterval && this.isInitialized) {
+                        this.startMainLoop();
+                    }
+                }
+            }
+
+            handleError(type, error) {
+                const errorMsg = error?.message || error || 'Unknown error';
+                this.log('error', `${type}: ${errorMsg}`);
+                
+                const friendlyMessage = this.t(`errors.${type}`, errorMsg);
+                this.showErrorDialog(this.t('errors.title', 'Error'), friendlyMessage);
+                
+                // Send error telemetry
+                if (APP_CONFIG.telemetry.enabled) {
+                    this.sendTelemetry('error_occurred', {
+                        type,
+                        message: errorMsg,
+                        stack: error?.stack,
+                        timestamp: new Date().toISOString()
+                    });
+                }
+            }
+
+            showErrorDialog(title, message) {
+                const dialog = document.createElement('div');
+                dialog.className = 'error-dialog';
+                dialog.innerHTML = `
+                    <div class="error-icon">⚠️</div>
+                    <div class="error-title">${title}</div>
+                    <div class="error-message">${message}</div>
+                    <div class="error-actions">
+                        <button class="btn btn-secondary" onclick="this.parentElement.parentElement.remove()">
+                            ${this.t('errors.dismiss', 'Dismiss')}
+                        </button>
+                        <button class="btn" onclick="window.location.reload()">
+                            ${this.t('errors.retry', 'Retry')}
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(dialog);
+
+                // Auto-dismiss after 10 seconds
+                setTimeout(() => {
+                    if (dialog.parentNode) {
+                        dialog.remove();
+                    }
+                }, 10000);
+            }
+
+            // Logging system
+            log(level, message, ...args) {
+                const timestamp = new Date().toISOString();
+                const logMessage = `[${timestamp}] [${level.toUpperCase()}] ${message}`;
+                
+                switch (level) {
+                    case 'error':
+                        console.error(logMessage, ...args);
+                        break;
+                    case 'warn':
+                        console.warn(logMessage, ...args);
+                        break;
+                    case 'info':
+                        console.info(logMessage, ...args);
+                        break;
+                    default:
+                        console.log(logMessage, ...args);
+                }
+            }
+
+            // Telemetry (respects privacy)
+            async sendTelemetry(event, data) {
+                if (!APP_CONFIG.telemetry.enabled) return;
+                
+                try {
+                    const payload = {
+                        event,
+                        data,
+                        timestamp: new Date().toISOString(),
+                        sessionId: this.getSessionId(),
+                        version: APP_CONFIG.version
+                    };
+                    
+                    // Only send if user has consented (would be implemented based on privacy requirements)
+                    await fetch(APP_CONFIG.telemetry.endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                } catch (error) {
+                    this.log('warn', 'Telemetry failed:', error);
+                }
+            }
+
+            getSessionId() {
+                if (!this.sessionId) {
+                    this.sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                }
+                return this.sessionId;
+            }
+
+            // Cleanup
             destroy() {
                 if (this.updateInterval) {
                     clearInterval(this.updateInterval);
@@ -2370,106 +2793,244 @@
                     const tracks = this.video.srcObject.getTracks();
                     tracks.forEach(track => track.stop());
                 }
+                
+                window.removeEventListener('deviceorientation', this.handleDeviceOrientation);
+                document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+                window.removeEventListener('error', this.handleError);
+                
+                this.log('info', 'Application destroyed');
             }
         }
 
-        // Initialize application
-        document.addEventListener('DOMContentLoaded', () => {
-            // Set initial language
-            updateTranslations();
-            
-            // Initialize the main application
-            satApp = new ProfessionalSatelliteFinder();
-        });
+        // Global functions for HTML event handlers
+        let app = null;
 
-        // Professional screen wake lock
-        let wakeLock = null;
-        if ('wakeLock' in navigator) {
-            navigator.wakeLock.request('screen').then((lock) => {
-                wakeLock = lock;
-                console.log('تم تفعيل منع قفل الشاشة');
-            }).catch(err => {
-                console.log('فشل في منع قفل الشاشة:', err);
-            });
+        async function requestCameraPermission() {
+            const btn = document.getElementById('cameraBtn');
+            const locationBtn = document.getElementById('locationBtn');
+            
+            try {
+                btn.textContent = 'Processing...';
+                btn.disabled = true;
+
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' } 
+                });
+                
+                stream.getTracks().forEach(track => track.stop());
+                
+                btn.textContent = '✓ Camera Access Granted';
+                btn.classList.add('success');
+                app.permissions.camera = true;
+                
+                locationBtn.disabled = false;
+                
+            } catch (error) {
+                btn.textContent = '✗ Camera Access Failed';
+                btn.style.background = 'var(--danger-color)';
+                
+                setTimeout(() => {
+                    btn.textContent = 'Retry Camera Access';
+                    btn.style.background = 'var(--primary-color)';
+                    btn.disabled = false;
+                }, 3000);
+            }
         }
+
+        async function requestLocationPermission() {
+            const btn = document.getElementById('locationBtn');
+            const orientationBtn = document.getElementById('orientationBtn');
+            
+            try {
+                btn.textContent = 'Processing...';
+                btn.disabled = true;
+
+                await app.getCurrentLocation();
+                
+                btn.textContent = '✓ Location Access Granted';
+                btn.classList.add('success');
+                app.permissions.location = true;
+                
+                orientationBtn.disabled = false;
+                
+            } catch (error) {
+                btn.textContent = '✗ Location Access Failed';
+                btn.style.background = 'var(--danger-color)';
+                
+                setTimeout(() => {
+                    btn.textContent = 'Retry Location Access';
+                    btn.style.background = 'var(--primary-color)';
+                    btn.disabled = false;
+                }, 3000);
+            }
+        }
+
+        async function requestOrientationPermission() {
+            const btn = document.getElementById('orientationBtn');
+            const startStep = document.getElementById('startStep');
+            
+            try {
+                btn.textContent = 'Processing...';
+                btn.disabled = true;
+
+                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    const permission = await DeviceOrientationEvent.requestPermission();
+                    if (permission !== 'granted') {
+                        throw new Error('Permission denied');
+                    }
+                }
+                
+                btn.textContent = '✓ Sensor Access Granted';
+                btn.classList.add('success');
+                app.permissions.orientation = true;
+                
+                startStep.style.display = 'block';
+                
+            } catch (error) {
+                btn.textContent = '✗ Sensor Access Failed';
+                btn.style.background = 'var(--danger-color)';
+                
+                setTimeout(() => {
+                    btn.textContent = 'Retry Sensor Access';
+                    btn.style.background = 'var(--primary-color)';
+                    btn.disabled = false;
+                }, 3000);
+            }
+        }
+
+        async function finishSetup() {
+            await app.completeInitialization();
+        }
+
+        function switchLanguage(lang) {
+            if (app) {
+                app.switchLanguage(lang);
+            }
+        }
+
+        function togglePanels() {
+            if (app) {
+                app.togglePanels();
+            }
+        }
+
+        function showPanels() {
+            if (app) {
+                app.showPanels();
+            }
+        }
+
+        // Initialize application when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            app = new SatelliteAlignmentApp();
+            
+            // Load saved language preference
+            try {
+                const savedLang = localStorage.getItem('satalign_language');
+                if (savedLang && APP_CONFIG.supportedLanguages.includes(savedLang)) {
+                    app.switchLanguage(savedLang);
+                }
+            } catch (e) {
+                // localStorage not available or failed
+            }
+        });
 
         // Handle app lifecycle
         window.addEventListener('beforeunload', () => {
-            if (wakeLock) {
-                wakeLock.release();
-            }
-            if (satApp) {
-                satApp.destroy();
+            if (app) {
+                app.destroy();
             }
         });
 
-        // Handle visibility changes for battery optimization
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) {
-                console.log('التطبيق نشط مرة أخرى');
-                
-                // Re-acquire wake lock if needed
-                if ('wakeLock' in navigator && !wakeLock) {
-                    navigator.wakeLock.request('screen').then((lock) => {
-                        wakeLock = lock;
-                    }).catch(err => {
-                        console.log('فشل في إعادة تفعيل منع قفل الشاشة:', err);
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    console.log('Service Worker registered successfully:', registration);
+                    
+                    // Listen for updates
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // Show update notification
+                                showUpdateNotification();
+                            }
+                        });
                     });
+                    
+                } catch (error) {
+                    console.log('Service Worker registration failed:', error);
                 }
-            } else {
-                // Release wake lock when app is hidden to save battery
-                if (wakeLock) {
-                    wakeLock.release();
-                    wakeLock = null;
-                }
-            }
-        });
-
-        // Professional error handling
-        window.addEventListener('error', (event) => {
-            console.error('خطأ عام:', event.error);
-            if (satApp) {
-                satApp.showError('خطأ في التطبيق', 'حدث خطأ غير متوقع. يرجى إعادة تحميل الصفحة.');
-            }
-        });
-
-        // Handle unhandled promise rejections
-        window.addEventListener('unhandledrejection', (event) => {
-            console.error('رفض غير معالج للوعد:', event.reason);
-            event.preventDefault();
-            if (satApp) {
-                satApp.showError('خطأ في النظام', 'حدث خطأ في النظام. يرجى المحاولة مرة أخرى.');
-            }
-        });
-
-        // Performance monitoring
-        if ('performance' in window) {
-            window.addEventListener('load', () => {
-                const perfData = performance.getEntriesByType('navigation')[0];
-                console.log('مقاييس أداء التطبيق:', {
-                    loadTime: perfData.loadEventEnd - perfData.loadEventStart,
-                    domContentLoaded: perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart,
-                    totalTime: perfData.loadEventEnd - perfData.fetchStart
-                });
             });
+        }
+
+        function showUpdateNotification() {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--glass-bg);
+                backdrop-filter: blur(20px);
+                border: 1px solid var(--primary-color);
+                border-radius: 12px;
+                padding: 16px;
+                color: var(--text-primary);
+                z-index: 1000;
+                font-size: 14px;
+                max-width: 300px;
+                box-shadow: 0 8px 32px rgba(0,102,204,0.3);
+            `;
+            notification.innerHTML = `
+                <div style="font-weight: 600; margin-bottom: 8px;">Update Available</div>
+                <div style="margin-bottom: 12px; color: var(--text-secondary);">A new version of SatAlign Pro is ready</div>
+                <button onclick="window.location.reload()" style="
+                    background: var(--primary-color);
+                    color: white;
+                    border: none;
+                    padding: 8px 16px;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    margin-right: 8px;
+                ">Update Now</button>
+                <button onclick="this.parentElement.remove()" style="
+                    background: transparent;
+                    color: var(--text-secondary);
+                    border: 1px solid var(--border-color);
+                    padding: 8px 16px;
+                    border-radius: 6px;
+                    cursor: pointer;
+                ">Later</button>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 10000);
         }
 
         // Professional console branding
         console.log(`
-%c╔═══════════════════════════════════════╗
-║        SatAlign Pro Enterprise        ║
-║     Professional Satellite Finder    ║
-║                                       ║
-║    🛰️  مبني بدقة واهتمام             ║
-║    🎯  أداء على مستوى المؤسسات        ║
-║    🌍  دعم متعدد اللغات               ║
-║    📱  هيكلة PWA احترافية             ║
-║                                       ║
-║         © 2024 SatAlign Pro           ║
-╚═══════════════════════════════════════╝`, 
-            'color: #0066cc; font-family: monospace; font-size: 12px; line-height: 1.4;'
+%c╔═══════════════════════════════════════════════════════════╗
+║               SatAlign Pro Enterprise                     ║
+║             Professional Satellite Alignment             ║
+║                                                           ║
+║    🛰️  Enterprise-grade precision and reliability        ║
+║    📱  Cross-platform mobile support                     ║
+║    🌍  Multi-language interface                          ║
+║    🎯  Advanced AR guidance system                       ║
+║    🔒  Security and privacy focused                      ║
+║                                                           ║
+║    Version: ${APP_CONFIG.version}                                    ║
+║    Build: ${APP_CONFIG.build}                               ║
+║    © 2024 SatAlign Pro Enterprise                        ║
+╚═══════════════════════════════════════════════════════════╝`, 
+            'color: #0066cc; font-family: monospace; font-size: 11px; line-height: 1.4;'
         );
     </script>
 </body>
 </html>
-                    
