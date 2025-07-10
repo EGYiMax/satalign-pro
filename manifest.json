@@ -1,25 +1,32 @@
 {
-  "name": "SatAlign Pro - محدد الأقمار الاحترافي",
+  "name": "SatAlign Pro Enterprise - محدد الأقمار الاحترافي",
   "short_name": "SatAlign Pro",
-  "description": "تطبيق احترافي لضبط أطباق الدش على الأقمار الصناعية",
+  "description": "تطبيق احترافي لضبط أطباق الدش على الأقمار الصناعية بدقة عالية مع دعم الواقع المعزز",
   "start_url": "/",
   "display": "fullscreen",
-  "background_color": "#000000",
-  "theme_color": "#007aff",
+  "background_color": "#1a1a1a",
+  "theme_color": "#0066cc",
   "orientation": "portrait",
   "scope": "/",
   "lang": "ar",
   "dir": "rtl",
-  "categories": ["utilities", "productivity"],
+  "categories": ["utilities", "productivity", "navigation", "tools"],
   "icons": [
     {
-      "src": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3e%3ccircle cx='96' cy='96' r='80' fill='%23007aff'/%3e%3ctext x='96' y='120' font-size='80' text-anchor='middle' fill='white'%3e📡%3c/text%3e%3c/svg%3e",
+      "src": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3e%3cdefs%3e%3clinearGradient id='grad1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3e%3cstop offset='0%25' stop-color='%230066cc'/%3e%3cstop offset='100%25' stop-color='%23004499'/%3e%3c/linearGradient%3e%3c/defs%3e%3ccircle cx='96' cy='96' r='85' fill='url(%23grad1)' stroke='%23ffffff' stroke-width='4'/%3e%3cg transform='translate(96,96)' fill='white'%3e%3ccircle cx='0' cy='0' r='35' fill='none' stroke='white' stroke-width='2'/%3e%3ccircle cx='0' cy='-25' r='3'/%3e%3cpath d='M-15,-15 L15,-15 M0,-30 L0,0 M-15,15 L15,15' stroke='white' stroke-width='2'/%3e%3c/g%3e%3c/svg%3e",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     },
     {
-      "src": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3e%3ccircle cx='256' cy='256' r='200' fill='%23007aff'/%3e%3ctext x='256' y='320' font-size='200' text-anchor='middle' fill='white'%3e📡%3c/text%3e%3c/svg%3e",
+      "src": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3e%3cdefs%3e%3clinearGradient id='grad2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3e%3cstop offset='0%25' stop-color='%230066cc'/%3e%3cstop offset='100%25' stop-color='%23004499'/%3e%3c/linearGradient%3e%3c/defs%3e%3ccircle cx='256' cy='256' r='230' fill='url(%23grad2)' stroke='%23ffffff' stroke-width='8'/%3e%3cg transform='translate(256,256)' fill='white'%3e%3ccircle cx='0' cy='0' r='90' fill='none' stroke='white' stroke-width='6'/%3e%3ccircle cx='0' cy='-65' r='8'/%3e%3cpath d='M-40,-40 L40,-40 M0,-80 L0,0 M-40,40 L40,40' stroke='white' stroke-width='6'/%3e%3ctext x='0' y='120' font-size='40' text-anchor='middle' font-weight='bold'%3eSatAlign%3c/text%3e%3c/g%3e%3c/svg%3e",
       "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 72'%3e%3ccircle cx='36' cy='36' r='32' fill='%230066cc'/%3e%3cg transform='translate(36,36)' fill='white'%3e%3ccircle cx='0' cy='0' r='15' fill='none' stroke='white' stroke-width='2'/%3e%3ccircle cx='0' cy='-10' r='2'/%3e%3cpath d='M-8,-8 L8,-8 M0,-15 L0,0 M-8,8 L8,8' stroke='white' stroke-width='2'/%3e%3c/g%3e%3c/svg%3e",
+      "sizes": "72x72",
       "type": "image/svg+xml"
     }
   ],
@@ -31,18 +38,93 @@
       "url": "/?quick=true",
       "icons": [
         {
-          "src": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3e%3ctext x='48' y='60' font-size='40' text-anchor='middle'%3e⚡%3c/text%3e%3c/svg%3e",
-          "sizes": "96x96"
+          "src": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3e%3ccircle cx='48' cy='48' r='40' fill='%23ffc107'/%3e%3cpath d='M48 20 L55 35 L70 35 L58 45 L62 60 L48 50 L34 60 L38 45 L26 35 L41 35 Z' fill='white'/%3e%3c/svg%3e",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "الأقمار العربية",
+      "short_name": "أقمار عربية",
+      "description": "الوصول المباشر للأقمار العربية",
+      "url": "/?filter=arab",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3e%3ccircle cx='48' cy='48' r='40' fill='%2328a745'/%3e%3ctext x='48' y='58' font-size='30' text-anchor='middle' fill='white'%3eعر%3c/text%3e%3c/svg%3e",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Help Guide",
+      "short_name": "دليل المساعدة",
+      "description": "دليل الاستخدام والمساعدة",
+      "url": "/?help=true",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3e%3ccircle cx='48' cy='48' r='40' fill='%23007bff'/%3e%3ctext x='48' y='60' font-size='40' text-anchor='middle' fill='white' font-weight='bold'%3e؟%3c/text%3e%3c/svg%3e",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
         }
       ]
     }
   ],
   "screenshots": [
     {
-      "src": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 844'%3e%3crect width='390' height='844' fill='%23000'/%3e%3ctext x='195' y='400' font-size='20' text-anchor='middle' fill='white'%3eSatAlign Pro%3c/text%3e%3c/svg%3e",
+      "src": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 844'%3e%3cdefs%3e%3clinearGradient id='bgGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3e%3cstop offset='0%25' stop-color='%231a1a1a'/%3e%3cstop offset='100%25' stop-color='%23000000'/%3e%3c/linearGradient%3e%3c/defs%3e%3crect width='390' height='844' fill='url(%23bgGrad)'/%3e%3cg transform='translate(195,422)'%3e%3ccircle cx='0' cy='0' r='150' fill='none' stroke='%230066cc' stroke-width='4' opacity='0.6'/%3e%3ccircle cx='0' cy='0' r='80' fill='none' stroke='%230066cc' stroke-width='2'/%3e%3cpath d='M-20,-20 L20,-20 M0,-30 L0,30 M-20,20 L20,20' stroke='%230066cc' stroke-width='3'/%3e%3ctext x='0' y='-180' font-size='28' text-anchor='middle' fill='white' font-weight='bold'%3eSatAlign Pro%3c/text%3e%3ctext x='0' y='-150' font-size='16' text-anchor='middle' fill='%23cccccc'%3eمحدد الأقمار الاحترافي%3c/text%3e%3cg transform='translate(0,200)'%3e%3crect x='-150' y='-30' width='300' height='60' rx='15' fill='%23ffffff' fill-opacity='0.1'/%3e%3ctext x='0' y='5' font-size='14' text-anchor='middle' fill='white'%3eضبط دقيق للأقمار الصناعية%3c/text%3e%3c/g%3e%3c/g%3e%3c/svg%3e",
       "sizes": "390x844",
       "type": "image/svg+xml",
-      "form_factor": "narrow"
+      "form_factor": "narrow",
+      "label": "واجهة التطبيق الرئيسية"
+    },
+    {
+      "src": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 768 1024'%3e%3cdefs%3e%3clinearGradient id='bgGrad2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3e%3cstop offset='0%25' stop-color='%231a1a1a'/%3e%3cstop offset='100%25' stop-color='%23000000'/%3e%3c/linearGradient%3e%3c/defs%3e%3crect width='768' height='1024' fill='url(%23bgGrad2)'/%3e%3cg transform='translate(384,512)'%3e%3ccircle cx='0' cy='0' r='200' fill='none' stroke='%230066cc' stroke-width='6' opacity='0.6'/%3e%3ccircle cx='0' cy='0' r='120' fill='none' stroke='%230066cc' stroke-width='4'/%3e%3cpath d='M-30,-30 L30,-30 M0,-40 L0,40 M-30,30 L30,30' stroke='%230066cc' stroke-width='4'/%3e%3ctext x='0' y='-250' font-size='36' text-anchor='middle' fill='white' font-weight='bold'%3eSatAlign Pro Enterprise%3c/text%3e%3ctext x='0' y='-210' font-size='20' text-anchor='middle' fill='%23cccccc'%3eمحدد الأقمار الصناعية الاحترافي%3c/text%3e%3c/g%3e%3c/svg%3e",
+      "sizes": "768x1024",
+      "type": "image/svg+xml",
+      "form_factor": "wide",
+      "label": "واجهة الجهاز اللوحي"
     }
-  ]
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "display_override": ["fullscreen", "standalone", "minimal-ui"],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "file_handlers": [
+    {
+      "action": "/",
+      "accept": {
+        "application/json": [".json"],
+        "text/csv": [".csv"]
+      }
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+satalign",
+      "url": "/?satellite=%s"
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "satellite_data",
+          "accept": ["application/json", "text/csv"]
+        }
+      ]
+    }
+  }
 }
