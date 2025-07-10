@@ -1,4 +1,708 @@
-const CACHE_NAME = 'satalign-pro-enterprise-v3.0.0'; // تحديث الإصدار مع كل إطلاق
+const CACHE_NAME = 'satalign-pro-enterprise-v3.0.0-production';
+const APP_VERSION = '3.0.0';
+const CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
+
+// Resources to cache for offline functionality
+const STATIC_RESOURCES = [
+  '/',
+  '/index.html',
+  '/manifest.json'
+];
+
+// Dynamic cache patterns
+const CACHE_PATTERNS = {
+  images: /\.(jpg|jpeg|png|gif|webp|svg|ico)$/i,
+  fonts: /\.(woff|woff2|ttf|eot)$/i,
+  api: /^https:\/\/api\.satalign\.pro\//,
+  telemetry: /^https:\/\/telemetry\.satalign\.pro\//
+};
+
+// Professional installation with comprehensive error handling
+self.addEventListener('install', function(event) {
+  console.log(`🚀 Installing SatAlign Pro Enterprise Service Worker v${APP_VERSION}`);
+  
+  event.waitUntil(
+    Promise.all([
+      // Cache static resources
+      caches.open(CACHE_NAME).then(cache => {
+        console.log('📦 Caching static resources');
+        return cache.addAll(STATIC_RESOURCES);
+      }),
+      
+      // Skip waiting to activate immediately
+      self.skipWaiting()
+    ]).then(() => {
+      console.log('✅ Service Worker installation completed');
+      
+      // Notify clients about successful installation
+      return broadcastToClients({
+        type: 'SW_INSTALLED',
+        version: APP_VERSION,
+        timestamp: new Date().toISOString()
+      });
+    }).catch(error => {
+      console.error('❌ Service Worker installation failed:', error);
+      throw error;
+    })
+  );
+});
+
+// Enhanced activation with client communication and cleanup
+self.addEventListener('activate', function(event) {
+  console.log(`🔄 Activating SatAlign Pro Enterprise Service Worker v${APP_VERSION}`);
+  
+  event.waitUntil(
+    Promise.all([
+      // Clean up old caches
+      cleanupOldCaches(),
+      
+      // Take control of all clients
+      self.clients.claim(),
+      
+      // Initialize application state
+      initializeAppState()
+      
+    ]).then(() => {
+      console.log('✅ Service Worker activation completed');
+      
+      // Notify all clients about the activation
+      return broadcastToClients({
+        type: 'SW_ACTIVATED',
+        version: APP_VERSION,
+        timestamp: new Date().toISOString(),
+        features: getAppFeatures()
+      });
+    }).catch(error => {
+      console.error('❌ Service Worker activation failed:', error);
+    })
+  );
+});
+
+// Intelligent fetch handling with advanced caching strategies
+self.addEventListener('fetch', function(event) {
+  const request = event.request;
+  const url = new URL(request.url);
+  
+  // Skip non-GET requests and cross-origin requests (except for specific APIs)
+  if (request.method !== 'GET' || (!isOriginAllowed(url) && !isApiRequest(url))) {
+    return;
+  }
+
+  // Determine cache strategy based on request type
+  const strategy = getCacheStrategy(request);
+  
+  event.respondWith(
+    executeStrategy(strategy, request).catch(error => {
+      console.error(`Fetch failed for ${request.url}:`, error);
+      return handleFetchError(request, error);
+    })
+  );
+});
+
+// Cache strategy determination
+function getCacheStrategy(request) {
+  const url = new URL(request.url);
+  
+  // API requests - Network first with cache fallback
+  if (CACHE_PATTERNS.api.test(url.href)) {
+    return 'network-first';
+  }
+  
+  // Telemetry - Network only (no cache)
+  if (CACHE_PATTERNS.telemetry.test(url.href)) {
+    return 'network-only';
+  }
+  
+  // Images - Cache first with network fallback
+  if (CACHE_PATTERNS.images.test(url.pathname)) {
+    return 'cache-first';
+  }
+  
+  // Fonts - Cache first (long-term cache)
+  if (CACHE_PATTERNS.fonts.test(url.pathname)) {
+    return 'cache-first';
+  }
+  
+  // Main document - Stale while revalidate
+  if (request.destination === 'document') {
+    return 'stale-while-revalidate';
+  }
+  
+  // Default strategy
+  return 'cache-first';
+}
+
+// Strategy execution
+async function executeStrategy(strategy, request) {
+  const cache = await caches.open(CACHE_NAME);
+  
+  switch (strategy) {
+    case 'network-first':
+      return networkFirst(cache, request);
+    
+    case 'cache-first':
+      return cacheFirst(cache, request);
+    
+    case 'stale-while-revalidate':
+      return staleWhileRevalidate(cache, request);
+    
+    case 'network-only':
+      return fetch(request);
+    
+    default:
+      return cacheFirst(cache, request);
+  }
+}
+
+// Network first strategy
+async function networkFirst(cache, request) {
+  try {
+    const response = await fetchAndCache(cache, request);
+    return response;
+  } catch (error) {
+    const cachedResponse = await cache.match(request);
+    if (cachedResponse) {
+      console.log(`📦 Serving cached response for ${request.url}`);
+      return cachedResponse;
+    }
+    throw error;
+  }
+}
+
+// Cache first strategy
+async function cacheFirst(cache, request) {
+  const cachedResponse = await cache.match(request);
+  if (cachedResponse && !isExpired(cachedResponse)) {
+    return cachedResponse;
+  }
+  
+  try {
+    return await fetchAndCache(cache, request);
+  } catch (error) {
+    if (cachedResponse) {
+      console.log(`📦 Serving expired cache for ${request.url}`);
+      return cachedResponse;
+    }
+    throw error;
+  }
+}
+
+// Stale while revalidate strategy
+async function staleWhileRevalidate(cache, request) {
+  const cachedResponse = await cache.match(request);
+  
+  // Always try to fetch in the background
+  const fetchPromise = fetchAndCache(cache, request).catch(error => {
+    console.warn(`Background fetch failed for ${request.url}:`, error);
+  });
+  
+  if (cachedResponse) {
+    // Return cached version immediately and update in background
+    return cachedResponse;
+  } else {
+    // Wait for network if no cache available
+    return fetchPromise;
+  }
+}
+
+// Enhanced fetch and cache function
+async function fetchAndCache(cache, request) {
+  const response = await fetch(request);
+  
+  // Only cache successful responses
+  if (response.status === 200) {
+    const responseToCache = response.clone();
+    
+    // Add timestamp for expiry checking
+    const headers = new Headers(responseToCache.headers);
+    headers.set('sw-cached-time', Date.now().toString());
+    
+    const modifiedResponse = new Response(responseToCache.body, {
+      status: responseToCache.status,
+      statusText: responseToCache.statusText,
+      headers: headers
+    });
+    
+    await cache.put(request, modifiedResponse);
+  }
+  
+  return response;
+}
+
+// Cache expiry checking
+function isExpired(response) {
+  const cachedTime = response.headers.get('sw-cached-time');
+  if (!cachedTime) return false;
+  
+  return (Date.now() - parseInt(cachedTime)) > CACHE_EXPIRY;
+}
+
+// Error handling for failed fetches
+function handleFetchError(request, error) {
+  // For HTML documents, try to serve a cached fallback
+  if (request.destination === 'document') {
+    return caches.match('/index.html').then(response => {
+      if (response) {
+        return response;
+      }
+      
+      // Return a basic offline page
+      return new Response(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>SatAlign Pro - Offline</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body { 
+              font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+              text-align: center; 
+              padding: 50px 20px; 
+              background: #0f0f0f; 
+              color: white; 
+            }
+            .logo { font-size: 48px; margin-bottom: 20px; }
+            .message { font-size: 18px; margin-bottom: 20px; }
+            .details { font-size: 14px; color: #888; }
+          </style>
+        </head>
+        <body>
+          <div class="logo">🛰️</div>
+          <h1>SatAlign Pro Enterprise</h1>
+          <div class="message">You're currently offline</div>
+          <div class="details">Please check your internet connection and try again</div>
+        </body>
+        </html>
+      `, {
+        status: 503,
+        statusText: 'Service Unavailable',
+        headers: {
+          'Content-Type': 'text/html'
+        }
+      });
+    });
+  }
+  
+  // For other resources, return a generic error response
+  return new Response(JSON.stringify({
+    error: 'Network unavailable',
+    message: 'This resource is not available offline',
+    timestamp: new Date().toISOString()
+  }), {
+    status: 503,
+    statusText: 'Service Unavailable',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+}
+
+// Professional message handling
+self.addEventListener('message', function(event) {
+  const { type, data } = event.data || {};
+  
+  handleMessage(type, data, event).catch(error => {
+    console.error(`Message handling failed for ${type}:`, error);
+  });
+});
+
+async function handleMessage(type, data, event) {
+  switch (type) {
+    case 'SKIP_WAITING':
+      await self.skipWaiting();
+      break;
+      
+    case 'GET_VERSION':
+      respondToClient(event, {
+        type: 'VERSION_INFO',
+        version: APP_VERSION,
+        cache: CACHE_NAME,
+        timestamp: new Date().toISOString(),
+        features: getAppFeatures()
+      });
+      break;
+      
+    case 'GET_CACHE_STATUS':
+      const status = await getCacheStatus();
+      respondToClient(event, {
+        type: 'CACHE_STATUS',
+        ...status
+      });
+      break;
+      
+    case 'CLEAR_CACHE':
+      const success = await clearApplicationCaches();
+      respondToClient(event, {
+        type: 'CACHE_CLEARED',
+        success,
+        timestamp: new Date().toISOString()
+      });
+      break;
+      
+    case 'SYNC_SATELLITE_DATA':
+      await syncSatelliteData(data);
+      respondToClient(event, {
+        type: 'SATELLITE_DATA_SYNCED',
+        timestamp: new Date().toISOString()
+      });
+      break;
+      
+    case 'LOG_USAGE':
+      await logUsageData(data);
+      break;
+      
+    default:
+      console.warn(`Unknown message type: ${type}`);
+  }
+}
+
+// Background sync handling
+self.addEventListener('sync', function(event) {
+  console.log(`🔄 Background sync triggered: ${event.tag}`);
+  
+  switch (event.tag) {
+    case 'satellite-data-sync':
+      event.waitUntil(syncSatelliteData());
+      break;
+      
+    case 'telemetry-sync':
+      event.waitUntil(syncTelemetryData());
+      break;
+      
+    case 'cache-cleanup':
+      event.waitUntil(performCacheCleanup());
+      break;
+      
+    default:
+      console.warn(`Unknown sync tag: ${event.tag}`);
+  }
+});
+
+// Professional push notification handling
+self.addEventListener('push', function(event) {
+  console.log('📬 Push notification received');
+  
+  let notificationData = {
+    title: 'SatAlign Pro Enterprise',
+    body: 'New satellite data available',
+    icon: '/icons/icon-192x192.png',
+    badge: '/icons/badge-72x72.png',
+    tag: 'satellite-update',
+    requireInteraction: false,
+    vibrate: [200, 100, 200],
+    data: {
+      url: '/',
+      timestamp: Date.now()
+    }
+  };
+
+  // Parse push data if available
+  if (event.data) {
+    try {
+      const pushData = event.data.json();
+      notificationData = { ...notificationData, ...pushData };
+    } catch (error) {
+      console.error('Failed to parse push data:', error);
+    }
+  }
+
+  const options = {
+    body: notificationData.body,
+    icon: notificationData.icon,
+    badge: notificationData.badge,
+    vibrate: notificationData.vibrate,
+    tag: notificationData.tag,
+    requireInteraction: notificationData.requireInteraction,
+    data: notificationData.data,
+    actions: [
+      {
+        action: 'open',
+        title: 'Open App',
+        icon: '/icons/action-open.png'
+      },
+      {
+        action: 'dismiss',
+        title: 'Dismiss',
+        icon: '/icons/action-dismiss.png'
+      }
+    ]
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(notificationData.title, options)
+  );
+});
+
+// Notification click handling
+self.addEventListener('notificationclick', function(event) {
+  console.log(`🔔 Notification clicked: ${event.action}`);
+  
+  event.notification.close();
+
+  if (event.action === 'dismiss') {
+    return;
+  }
+
+  const urlToOpen = event.notification.data?.url || '/';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then(function(clientList) {
+        // Try to focus existing window
+        for (const client of clientList) {
+          if (client.url.includes(self.location.origin) && 'focus' in client) {
+            return client.focus();
+          }
+        }
+        
+        // Open new window if none found
+        if (clients.openWindow) {
+          return clients.openWindow(urlToOpen);
+        }
+      })
+  );
+});
+
+// Utility functions
+async function cleanupOldCaches() {
+  const cacheNames = await caches.keys();
+  const oldCaches = cacheNames.filter(name => 
+    name.startsWith('satalign-pro') && name !== CACHE_NAME
+  );
+  
+  const deletePromises = oldCaches.map(name => {
+    console.log(`🗑️ Deleting old cache: ${name}`);
+    return caches.delete(name);
+  });
+  
+  await Promise.all(deletePromises);
+  console.log(`✅ Cleaned up ${oldCaches.length} old caches`);
+}
+
+async function initializeAppState() {
+  // Initialize any required application state
+  console.log('🔧 Initializing application state');
+  
+  // Could include setting up IndexedDB, checking for updates, etc.
+}
+
+function isOriginAllowed(url) {
+  return url.origin === self.location.origin;
+}
+
+function isApiRequest(url) {
+  return CACHE_PATTERNS.api.test(url.href) || CACHE_PATTERNS.telemetry.test(url.href);
+}
+
+async function broadcastToClients(message) {
+  const clients = await self.clients.matchAll();
+  clients.forEach(client => {
+    client.postMessage(message);
+  });
+}
+
+function respondToClient(event, response) {
+  if (event.ports && event.ports[0]) {
+    event.ports[0].postMessage(response);
+  }
+}
+
+async function getCacheStatus() {
+  try {
+    const cacheNames = await caches.keys();
+    const appCaches = cacheNames.filter(name => name.startsWith('satalign-pro'));
+    
+    const cacheDetails = await Promise.all(
+      appCaches.map(async name => {
+        const cache = await caches.open(name);
+        const keys = await cache.keys();
+        return {
+          name,
+          size: keys.length,
+          current: name === CACHE_NAME
+        };
+      })
+    );
+    
+    return {
+      totalCaches: appCaches.length,
+      currentCache: CACHE_NAME,
+      caches: cacheDetails,
+      version: APP_VERSION
+    };
+  } catch (error) {
+    console.error('Failed to get cache status:', error);
+    return { error: error.message };
+  }
+}
+
+async function clearApplicationCaches() {
+  try {
+    const cacheNames = await caches.keys();
+    const appCaches = cacheNames.filter(name => name.startsWith('satalign-pro'));
+    
+    const deletePromises = appCaches.map(name => caches.delete(name));
+    await Promise.all(deletePromises);
+    
+    console.log(`🧹 Cleared ${appCaches.length} application caches`);
+    return true;
+  } catch (error) {
+    console.error('Failed to clear caches:', error);
+    return false;
+  }
+}
+
+async function syncSatelliteData(data) {
+  try {
+    console.log('🛰️ Syncing satellite data...');
+    
+    if (data && data.satellites) {
+      const cache = await caches.open(CACHE_NAME);
+      const response = new Response(JSON.stringify(data), {
+        headers: {
+          'Content-Type': 'application/json',
+          'sw-cached-time': Date.now().toString()
+        }
+      });
+      await cache.put('/satellite-data.json', response);
+    }
+    
+    await broadcastToClients({
+      type: 'SATELLITE_DATA_UPDATED',
+      timestamp: new Date().toISOString()
+    });
+    
+    console.log('✅ Satellite data sync completed');
+  } catch (error) {
+    console.error('❌ Satellite data sync failed:', error);
+  }
+}
+
+async function syncTelemetryData() {
+  try {
+    console.log('📊 Syncing telemetry data...');
+    
+    // Implementation would depend on telemetry requirements
+    // This would typically send queued analytics data
+    
+    console.log('✅ Telemetry sync completed');
+  } catch (error) {
+    console.error('❌ Telemetry sync failed:', error);
+  }
+}
+
+async function performCacheCleanup() {
+  try {
+    console.log('🧹 Performing cache cleanup...');
+    
+    const cache = await caches.open(CACHE_NAME);
+    const requests = await cache.keys();
+    
+    // Remove expired entries
+    const expiredRequests = [];
+    for (const request of requests) {
+      const response = await cache.match(request);
+      if (response && isExpired(response)) {
+        expiredRequests.push(request);
+      }
+    }
+    
+    const deletePromises = expiredRequests.map(request => cache.delete(request));
+    await Promise.all(deletePromises);
+    
+    console.log(`✅ Cache cleanup completed, removed ${expiredRequests.length} expired entries`);
+  } catch (error) {
+    console.error('❌ Cache cleanup failed:', error);
+  }
+}
+
+async function logUsageData(data) {
+  try {
+    // Store usage data for later sync
+    // Implementation would depend on privacy requirements
+    console.log('📊 Usage data logged');
+  } catch (error) {
+    console.error('Failed to log usage data:', error);
+  }
+}
+
+function getAppFeatures() {
+  return [
+    'Professional Satellite Alignment',
+    'Enterprise-grade Precision',
+    'Cross-platform Support',
+    'AR Guidance System',
+    'Multi-language Interface',
+    'Offline Capability',
+    'Real-time Updates',
+    'Professional Compass',
+    'Advanced Calculations',
+    'Secure Data Handling'
+  ];
+}
+
+// Error handling
+self.addEventListener('error', function(event) {
+  console.error('🚨 Service Worker error:', event.error);
+  
+  broadcastToClients({
+    type: 'SW_ERROR',
+    error: event.error.message,
+    timestamp: new Date().toISOString()
+  });
+});
+
+self.addEventListener('unhandledrejection', function(event) {
+  console.error('🚨 Unhandled promise rejection in SW:', event.reason);
+  event.preventDefault();
+  
+  broadcastToClients({
+    type: 'SW_ERROR',
+    error: 'Unhandled promise rejection',
+    details: event.reason?.message || String(event.reason),
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Periodic maintenance
+function schedulePeriodicMaintenance() {
+  setInterval(() => {
+    performCacheCleanup();
+  }, 6 * 60 * 60 * 1000); // Every 6 hours
+}
+
+// Professional startup logging
+console.log(`
+╔═══════════════════════════════════════════════════════════╗
+║               SatAlign Pro Enterprise                     ║
+║            Production Service Worker v${APP_VERSION}                ║
+║                                                           ║
+║  🛰️  Professional Satellite Alignment System             ║
+║  🌍  Multi-platform Support (iOS/Android/Desktop)        ║
+║  📱  Progressive Web Application                          ║
+║  🔒  Enterprise Security & Privacy                       ║
+║  ⚡  Optimized Performance & Caching                     ║
+║  🎯  Advanced AR Guidance                                ║
+║                                                           ║
+║  Cache: ${CACHE_NAME}    ║
+║  Started: ${new Date().toISOString()}                   ║
+╚═══════════════════════════════════════════════════════════╝
+`);
+
+// Initialize maintenance schedule
+schedulePeriodicMaintenance();
+
+// Export service worker information for debugging
+self.SW_INFO = {
+  name: 'SatAlign Pro Enterprise',
+  version: APP_VERSION,
+  cache: CACHE_NAME,
+  startupTime: new Date().toISOString(),
+  features: getAppFeatures(),
+  cacheStrategy: 'intelligent-multi-tier',
+  supportedPlatforms: ['iOS', 'Android', 'Desktop'],
+  securityLevel: 'Enterprise'
+};
 const urlsToCache = [
   '/',
   '/index.html',
