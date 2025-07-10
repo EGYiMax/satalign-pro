@@ -2,154 +2,26 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SatAlign Pro - محدد الأقمار الاحترافي</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Meta tags للـ PWA -->
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SatAlign Pro">
+    
+    <!-- Icons للـ PWA -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3e%3ccircle cx='50' cy='50' r='40' fill='%23007aff'/%3e%3ctext x='50' y='60' font-size='40' text-anchor='middle' fill='white'%3e📡%3c/text%3e%3c/svg%3e">
+    
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        // متغير عام للتطبيق
-        let satApp = null;
-
-        // Functions لطلب الصلاحيات (يجب أن تكون global لتعمل مع onclick)
-        async function requestCameraPermission() {
-            const btn = document.getElementById('cameraBtn');
-            const locationBtn = document.getElementById('locationBtn');
-            
-            try {
-                btn.textContent = '⏳ جاري طلب الصلاحية...';
-                btn.disabled = true;
-
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'environment' } 
-                });
-                
-                // إيقاف الستريم مؤقتاً
-                stream.getTracks().forEach(track => track.stop());
-                
-                btn.textContent = '✅ تم منح صلاحية الكاميرا';
-                btn.classList.add('success');
-                satApp.cameraPermission = true;
-                
-                // تفعيل الزر التالي
-                locationBtn.disabled = false;
-                
-            } catch (error) {
-                btn.textContent = '❌ فشل في الحصول على الصلاحية';
-                btn.style.background = '#ff3b30';
-                
-                setTimeout(() => {
-                    btn.textContent = '📷 إعادة المحاولة';
-                    btn.style.background = '#007aff';
-                    btn.disabled = false;
-                }, 3000);
-            }
-        }
-
-        async function requestLocationPermission() {
-            const btn = document.getElementById('locationBtn');
-            const orientationBtn = document.getElementById('orientationBtn');
-            
-            try {
-                btn.textContent = '⏳ جاري تحديد الموقع...';
-                btn.disabled = true;
-
-                await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                            satApp.userLat = position.coords.latitude;
-                            satApp.userLon = position.coords.longitude;
-                            satApp.gpsAccuracy = Math.round(position.coords.accuracy);
-                            resolve();
-                        },
-                        (error) => reject(error),
-                        { enableHighAccuracy: true, timeout: 15000 }
-                    );
-                });
-                
-                btn.textContent = '✅ تم تحديد الموقع بنجاح';
-                btn.classList.add('success');
-                satApp.locationPermission = true;
-                
-                // تفعيل الزر التالي
-                orientationBtn.disabled = false;
-                
-            } catch (error) {
-                btn.textContent = '❌ فشل في تحديد الموقع';
-                btn.style.background = '#ff3b30';
-                
-                setTimeout(() => {
-                    btn.textContent = '🌍 إعادة المحاولة';
-                    btn.style.background = '#007aff';
-                    btn.disabled = false;
-                }, 3000);
-            }
-        }
-
-        async function requestOrientationPermission() {
-            const btn = document.getElementById('orientationBtn');
-            const startStep = document.getElementById('startStep');
-            
-            try {
-                btn.textContent = '⏳ جاري طلب صلاحية الاستشعار...';
-                btn.disabled = true;
-
-                // للايفون
-                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    const permission = await DeviceOrientationEvent.requestPermission();
-                    if (permission !== 'granted') {
-                        throw new Error('تم رفض الصلاحية');
-                    }
-                }
-                
-                btn.textContent = '✅ تم منح صلاحية الاستشعار';
-                btn.classList.add('success');
-                satApp.orientationPermission = true;
-                
-                // إظهار زر البدء
-                startStep.style.display = 'block';
-                
-            } catch (error) {
-                btn.textContent = '❌ فشل في الحصول على الصلاحية';
-                btn.style.background = '#ff3b30';
-                
-                setTimeout(() => {
-                    btn.textContent = '🧭 إعادة المحاولة';
-                    btn.style.background = '#007aff';
-                    btn.disabled = false;
-                }, 3000);
-            }
-        }
-
-        async function finishSetup() {
-            const loadingScreen = document.getElementById('loadingScreen');
-            const loadingDetails = document.getElementById('loadingDetails');
-            
-            try {
-                loadingDetails.textContent = 'حساب الانحراف المغناطيسي...';
-                await satApp.calculateMagneticDeclination();
-                
-                loadingDetails.textContent = 'تهيئة الكاميرا...';
-                await satApp.getUserMedia();
-                
-                loadingDetails.textContent = 'تهيئة أجهزة الاستشعار...';
-                await satApp.setupSensors();
-                
-                loadingDetails.textContent = 'تحميل واجهة المستخدم...';
-                satApp.setupEventListeners();
-                
-                loadingDetails.textContent = 'مكتمل!';
-                setTimeout(() => {
-                    loadingScreen.style.display = 'none';
-                    satApp.startUpdates();
-                }, 500);
-                
-            } catch (error) {
-                satApp.showError('خطأ في التهيئة', error.message);
-            }
         }
 
         body {
@@ -489,6 +361,7 @@
             text-align: center;
             max-width: 300px;
             border: 1px solid rgba(255,255,255,0.2);
+            z-index: 200;
         }
 
         .error-icon {
@@ -513,17 +386,6 @@
             right: 0;
             height: 2px;
             background: rgba(255,255,255,0.3);
-            pointer-events: none;
-        }
-
-        .elevation-arc {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 50%;
-            left: 50%;
-            transform: translateX(-50%);
             pointer-events: none;
         }
 
@@ -615,23 +477,6 @@
             font-size: 14px;
             color: rgba(255,255,255,0.8);
             line-height: 1.4;
-        }
-
-        .settings-toggle {
-            position: absolute;
-            top: env(safe-area-inset-top, 20px);
-            left: 20px;
-            width: 44px;
-            height: 44px;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(20px);
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 25;
         }
     </style>
 </head>
@@ -786,6 +631,147 @@
     </div>
 
     <script>
+        // متغير عام للتطبيق
+        let satApp = null;
+
+        // Functions لطلب الصلاحيات (يجب أن تكون global لتعمل مع onclick)
+        async function requestCameraPermission() {
+            const btn = document.getElementById('cameraBtn');
+            const locationBtn = document.getElementById('locationBtn');
+            
+            try {
+                btn.textContent = '⏳ جاري طلب الصلاحية...';
+                btn.disabled = true;
+
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' } 
+                });
+                
+                // إيقاف الستريم مؤقتاً
+                stream.getTracks().forEach(track => track.stop());
+                
+                btn.textContent = '✅ تم منح صلاحية الكاميرا';
+                btn.classList.add('success');
+                satApp.cameraPermission = true;
+                
+                // تفعيل الزر التالي
+                locationBtn.disabled = false;
+                
+            } catch (error) {
+                btn.textContent = '❌ فشل في الحصول على الصلاحية';
+                btn.style.background = '#ff3b30';
+                
+                setTimeout(() => {
+                    btn.textContent = '📷 إعادة المحاولة';
+                    btn.style.background = '#007aff';
+                    btn.disabled = false;
+                }, 3000);
+            }
+        }
+
+        async function requestLocationPermission() {
+            const btn = document.getElementById('locationBtn');
+            const orientationBtn = document.getElementById('orientationBtn');
+            
+            try {
+                btn.textContent = '⏳ جاري تحديد الموقع...';
+                btn.disabled = true;
+
+                await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            satApp.userLat = position.coords.latitude;
+                            satApp.userLon = position.coords.longitude;
+                            satApp.gpsAccuracy = Math.round(position.coords.accuracy);
+                            resolve();
+                        },
+                        (error) => reject(error),
+                        { enableHighAccuracy: true, timeout: 15000 }
+                    );
+                });
+                
+                btn.textContent = '✅ تم تحديد الموقع بنجاح';
+                btn.classList.add('success');
+                satApp.locationPermission = true;
+                
+                // تفعيل الزر التالي
+                orientationBtn.disabled = false;
+                
+            } catch (error) {
+                btn.textContent = '❌ فشل في تحديد الموقع';
+                btn.style.background = '#ff3b30';
+                
+                setTimeout(() => {
+                    btn.textContent = '🌍 إعادة المحاولة';
+                    btn.style.background = '#007aff';
+                    btn.disabled = false;
+                }, 3000);
+            }
+        }
+
+        async function requestOrientationPermission() {
+            const btn = document.getElementById('orientationBtn');
+            const startStep = document.getElementById('startStep');
+            
+            try {
+                btn.textContent = '⏳ جاري طلب صلاحية الاستشعار...';
+                btn.disabled = true;
+
+                // للايفون
+                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    const permission = await DeviceOrientationEvent.requestPermission();
+                    if (permission !== 'granted') {
+                        throw new Error('تم رفض الصلاحية');
+                    }
+                }
+                
+                btn.textContent = '✅ تم منح صلاحية الاستشعار';
+                btn.classList.add('success');
+                satApp.orientationPermission = true;
+                
+                // إظهار زر البدء
+                startStep.style.display = 'block';
+                
+            } catch (error) {
+                btn.textContent = '❌ فشل في الحصول على الصلاحية';
+                btn.style.background = '#ff3b30';
+                
+                setTimeout(() => {
+                    btn.textContent = '🧭 إعادة المحاولة';
+                    btn.style.background = '#007aff';
+                    btn.disabled = false;
+                }, 3000);
+            }
+        }
+
+        async function finishSetup() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const loadingDetails = document.getElementById('loadingDetails');
+            
+            try {
+                loadingDetails.textContent = 'حساب الانحراف المغناطيسي...';
+                await satApp.calculateMagneticDeclination();
+                
+                loadingDetails.textContent = 'تهيئة الكاميرا...';
+                await satApp.getUserMedia();
+                
+                loadingDetails.textContent = 'تهيئة أجهزة الاستشعار...';
+                await satApp.setupSensors();
+                
+                loadingDetails.textContent = 'تحميل واجهة المستخدم...';
+                satApp.setupEventListeners();
+                
+                loadingDetails.textContent = 'مكتمل!';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    satApp.startUpdates();
+                }, 500);
+                
+            } catch (error) {
+                satApp.showError('خطأ في التهيئة', error.message);
+            }
+        }
+
         class ProfessionalSatelliteFinder {
             constructor() {
                 this.initializeElements();
@@ -1116,7 +1102,6 @@
 
             async calculateMagneticDeclination() {
                 // حساب تقريبي للانحراف المغناطيسي
-                // يمكن تحسينه باستخدام API متخصص
                 const lat = this.userLat;
                 const lon = this.userLon;
                 
@@ -1480,6 +1465,19 @@
             }
         }
 
+        // تسجيل Service Worker للعمل Offline
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(function(registrationError) {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+
         // بدء التطبيق عند تحميل الصفحة
         document.addEventListener('DOMContentLoaded', () => {
             satApp = new ProfessionalSatelliteFinder();
@@ -1490,6 +1488,8 @@
         if ('wakeLock' in navigator) {
             navigator.wakeLock.request('screen').then((lock) => {
                 wakeLock = lock;
+            }).catch(err => {
+                console.log('Wake lock failed:', err);
             });
         }
 
