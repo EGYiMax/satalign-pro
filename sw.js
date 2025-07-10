@@ -1,76 +1,76 @@
-const CACHE_NAME = 'satalign-pro-enterprise-v2.0.0'; // Update this with each release
+const CACHE_NAME = 'satalign-pro-enterprise-v3.0.0'; // تحديث الإصدار مع كل إطلاق
 const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json'
 ];
 
-// Professional installation with enhanced error handling
+// تثبيت احترافي مع معالجة محسنة للأخطاء
 self.addEventListener('install', function(event) {
-  console.log('🚀 Installing SatAlign Pro Enterprise Service Worker v2.0.0');
+  console.log('🚀 تثبيت SatAlign Pro Enterprise Service Worker v3.0.0');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(function(cache) {
-        console.log('📦 Opening cache:', CACHE_NAME);
+        console.log('📦 فتح ذاكرة التخزين المؤقت:', CACHE_NAME);
         return cache.addAll(urlsToCache);
       })
       .then(() => {
-        console.log('✅ Cache populated successfully');
+        console.log('✅ تم ملء ذاكرة التخزين المؤقت بنجاح');
         return self.skipWaiting();
       })
       .catch(error => {
-        console.error('❌ Cache population failed:', error);
+        console.error('❌ فشل في ملء ذاكرة التخزين المؤقت:', error);
         throw error;
       })
   );
 });
 
-// Enhanced activation with client communication
+// تفعيل محسن مع تواصل العميل
 self.addEventListener('activate', function(event) {
-  console.log('🔄 Activating SatAlign Pro Enterprise Service Worker');
+  console.log('🔄 تفعيل SatAlign Pro Enterprise Service Worker');
   event.waitUntil(
     Promise.all([
-      // Clean up old caches
+      // تنظيف ذاكرات التخزين القديمة
       caches.keys().then(function(cacheNames) {
         return Promise.all(
           cacheNames.map(function(cacheName) {
             if (cacheName !== CACHE_NAME && cacheName.startsWith('satalign-pro')) {
-              console.log('🗑️ Deleting old cache:', cacheName);
+              console.log('🗑️ حذف ذاكرة التخزين القديمة:', cacheName);
               return caches.delete(cacheName);
             }
           })
         );
       }),
-      // Take control of all clients
+      // السيطرة على جميع العملاء
       self.clients.claim()
     ]).then(() => {
-      // Notify all clients about the update
+      // إشعار جميع العملاء بالتحديث
       return self.clients.matchAll().then(clients => {
         clients.forEach(client => {
           client.postMessage({
             type: 'SW_UPDATED',
-            message: 'SatAlign Pro Enterprise has been updated to the latest version',
+            message: 'تم تحديث SatAlign Pro Enterprise إلى أحدث إصدار',
             version: CACHE_NAME,
             timestamp: new Date().toISOString()
           });
         });
       });
     }).then(() => {
-      console.log('✅ Service Worker activation complete');
+      console.log('✅ اكتمل تفعيل Service Worker');
     }).catch(error => {
-      console.error('❌ Service Worker activation failed:', error);
+      console.error('❌ فشل في تفعيل Service Worker:', error);
     })
   );
 });
 
-// Professional fetch handling with intelligent caching strategies
+// معالجة احترافية للطلبات مع استراتيجيات تخزين ذكية
 self.addEventListener('fetch', function(event) {
-  // Skip non-GET requests
+  // تخطي الطلبات غير GET
   if (event.request.method !== 'GET') {
     return;
   }
 
-  // Skip cross-origin requests
+  // تخطي الطلبات عبر النطاقات
   if (!event.request.url.startsWith(self.location.origin)) {
     return;
   }
@@ -78,61 +78,61 @@ self.addEventListener('fetch', function(event) {
   event.respondWith(
     caches.match(event.request)
       .then(function(cachedResponse) {
-        // Return cached version if available
+        // إرجاع النسخة المحفوظة إذا كانت متوفرة
         if (cachedResponse) {
-          // For HTML documents, check for updates in background
+          // للمستندات HTML، فحص التحديثات في الخلفية
           if (event.request.destination === 'document') {
             fetchAndCache(event.request);
           }
           return cachedResponse;
         }
         
-        // Not in cache, fetch from network
+        // غير موجود في ذاكرة التخزين، جلب من الشبكة
         return fetchAndCache(event.request);
       })
       .catch(() => {
-        // Network and cache both failed
+        // فشلت الشبكة وذاكرة التخزين المؤقت
         if (event.request.destination === 'document') {
           return caches.match('/index.html');
         }
         
-        // For other resources, return a generic offline response
-        return new Response('Offline - SatAlign Pro Enterprise', {
+        // للموارد الأخرى، إرجاع استجابة عامة للوضع غير المتصل
+        return new Response('غير متصل - SatAlign Pro Enterprise', {
           status: 503,
-          statusText: 'Service Unavailable',
+          statusText: 'الخدمة غير متوفرة',
           headers: new Headers({
-            'Content-Type': 'text/plain'
+            'Content-Type': 'text/plain; charset=utf-8'
           })
         });
       })
   );
 });
 
-// Enhanced fetch and cache function
+// دالة جلب وتخزين محسنة
 async function fetchAndCache(request) {
   try {
     const response = await fetch(request);
     
-    // Check if response is valid
+    // فحص صحة الاستجابة
     if (!response || response.status !== 200 || response.type !== 'basic') {
       return response;
     }
 
-    // Clone response for caching
+    // نسخ الاستجابة للتخزين
     const responseToCache = response.clone();
 
-    // Cache the response
+    // تخزين الاستجابة
     const cache = await caches.open(CACHE_NAME);
     await cache.put(request, responseToCache);
     
     return response;
   } catch (error) {
-    console.error('Fetch failed:', error);
+    console.error('فشل في الجلب:', error);
     throw error;
   }
 }
 
-// Professional message handling
+// معالجة احترافية للرسائل
 self.addEventListener('message', function(event) {
   const { type, data } = event.data || {};
   
@@ -147,11 +147,11 @@ self.addEventListener('message', function(event) {
         version: CACHE_NAME,
         timestamp: new Date().toISOString(),
         features: [
-          'Professional Satellite Alignment',
-          'Multi-language Support',
-          'AR Guidance System',
-          'Enterprise-grade Precision',
-          'Offline Capability'
+          'ضبط احترافي للأقمار الصناعية',
+          'دعم متعدد اللغات',
+          'نظام توجيه الواقع المعزز',
+          'دقة على مستوى المؤسسات',
+          'قدرة العمل غير المتصل'
         ]
       });
       break;
@@ -173,13 +173,22 @@ self.addEventListener('message', function(event) {
         });
       });
       break;
+
+    case 'UPDATE_SATELLITE_DATA':
+      updateSatelliteData(data).then(result => {
+        event.ports[0].postMessage({
+          type: 'SATELLITE_DATA_UPDATED',
+          success: result
+        });
+      });
+      break;
       
     default:
-      console.log('Unknown message type:', type);
+      console.log('نوع رسالة غير معروف:', type);
   }
 });
 
-// Get comprehensive cache status
+// الحصول على حالة شاملة لذاكرة التخزين المؤقت
 async function getCacheStatus() {
   try {
     const cacheNames = await caches.keys();
@@ -201,12 +210,12 @@ async function getCacheStatus() {
       caches: cacheDetails
     };
   } catch (error) {
-    console.error('Failed to get cache status:', error);
+    console.error('فشل في الحصول على حالة ذاكرة التخزين المؤقت:', error);
     return { error: error.message };
   }
 }
 
-// Clear all application caches
+// مسح جميع ذاكرات التخزين المؤقت للتطبيق
 async function clearAllCaches() {
   try {
     const cacheNames = await caches.keys();
@@ -215,17 +224,54 @@ async function clearAllCaches() {
       .map(name => caches.delete(name));
     
     await Promise.all(deletePromises);
-    console.log('🧹 All caches cleared successfully');
+    console.log('🧹 تم مسح جميع ذاكرات التخزين المؤقت بنجاح');
     return true;
   } catch (error) {
-    console.error('Failed to clear caches:', error);
+    console.error('فشل في مسح ذاكرات التخزين المؤقت:', error);
     return false;
   }
 }
 
-// Professional background sync for data updates
+// تحديث بيانات الأقمار الصناعية
+async function updateSatelliteData(data) {
+  try {
+    console.log('🛰️ تحديث بيانات الأقمار الصناعية...');
+    
+    // هنا يمكن إضافة منطق حفظ بيانات الأقمار الجديدة
+    const cache = await caches.open(CACHE_NAME);
+    
+    if (data && data.satellites) {
+      // حفظ البيانات الجديدة في ذاكرة التخزين المؤقت
+      const response = new Response(JSON.stringify(data), {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      await cache.put('/satellite-data.json', response);
+    }
+    
+    const timestamp = new Date().toISOString();
+    console.log('✅ اكتمل تحديث بيانات الأقمار الصناعية في:', timestamp);
+    
+    // إشعار العملاء بالتحديث
+    const clients = await self.clients.matchAll();
+    clients.forEach(client => {
+      client.postMessage({
+        type: 'SATELLITE_DATA_UPDATED',
+        timestamp
+      });
+    });
+
+    return true;
+  } catch (error) {
+    console.error('❌ فشل في تحديث بيانات الأقمار الصناعية:', error);
+    return false;
+  }
+}
+
+// مزامنة خلفية احترافية لتحديثات البيانات
 self.addEventListener('sync', function(event) {
-  console.log('🔄 Background sync triggered:', event.tag);
+  console.log('🔄 تم تشغيل مزامنة الخلفية:', event.tag);
   
   switch (event.tag) {
     case 'satellite-data-sync':
@@ -235,69 +281,88 @@ self.addEventListener('sync', function(event) {
     case 'usage-analytics':
       event.waitUntil(syncUsageAnalytics());
       break;
+
+    case 'location-update':
+      event.waitUntil(syncLocationData());
+      break;
       
     default:
-      console.log('Unknown sync tag:', event.tag);
+      console.log('علامة مزامنة غير معروفة:', event.tag);
   }
 });
 
-// Sync satellite database updates
+// مزامنة قاعدة بيانات الأقمار الصناعية
 async function syncSatelliteData() {
   try {
-    console.log('🛰️ Syncing satellite data...');
+    console.log('🛰️ مزامنة بيانات الأقمار الصناعية...');
     
-    // This would typically fetch updated satellite data from a server
-    // For now, we'll just log the action
+    // هذا المكان يمكن أن يحتوي على منطق جلب بيانات محدثة من الخادم
+    // في الوقت الحالي، سنقوم بتسجيل العملية فقط
     const timestamp = new Date().toISOString();
-    console.log('✅ Satellite data sync completed at:', timestamp);
+    console.log('✅ اكتملت مزامنة بيانات الأقمار الصناعية في:', timestamp);
     
-    // Notify clients about the update
+    // إشعار العملاء بالتحديث
     const clients = await self.clients.matchAll();
     clients.forEach(client => {
       client.postMessage({
-        type: 'SATELLITE_DATA_UPDATED',
+        type: 'SATELLITE_DATA_SYNCED',
         timestamp
       });
     });
   } catch (error) {
-    console.error('❌ Satellite data sync failed:', error);
+    console.error('❌ فشلت مزامنة بيانات الأقمار الصناعية:', error);
   }
 }
 
-// Sync usage analytics (privacy-conscious)
+// مزامنة تحليلات الاستخدام (مع مراعاة الخصوصية)
 async function syncUsageAnalytics() {
   try {
-    console.log('📊 Syncing usage analytics...');
+    console.log('📊 مزامنة تحليلات الاستخدام...');
     
-    // This would typically send anonymized usage data
-    // Implementation would depend on privacy requirements
-    console.log('✅ Usage analytics sync completed');
+    // هذا يمكن أن يحتوي على إرسال بيانات استخدام مجهولة الهوية
+    // تنفيذ ذلك يعتمد على متطلبات الخصوصية
+    console.log('✅ اكتملت مزامنة تحليلات الاستخدام');
   } catch (error) {
-    console.error('❌ Usage analytics sync failed:', error);
+    console.error('❌ فشلت مزامنة تحليلات الاستخدام:', error);
   }
 }
 
-// Professional push notification handling
+// مزامنة بيانات الموقع
+async function syncLocationData() {
+  try {
+    console.log('📍 مزامنة بيانات الموقع...');
+    
+    // منطق تحديث بيانات الموقع والانحراف المغناطيسي
+    console.log('✅ اكتملت مزامنة بيانات الموقع');
+  } catch (error) {
+    console.error('❌ فشلت مزامنة بيانات الموقع:', error);
+  }
+}
+
+// معالجة احترافية للإشعارات التحفيزية
 self.addEventListener('push', function(event) {
-  console.log('📬 Push notification received');
+  console.log('📬 تم استلام إشعار تحفيزي');
   
   let notificationData = {
     title: 'SatAlign Pro Enterprise',
-    body: 'New satellite data available',
+    body: 'بيانات أقمار صناعية جديدة متوفرة',
     icon: '/icons/icon-192x192.png',
     badge: '/icons/badge-72x72.png',
     tag: 'satellite-update',
     requireInteraction: false,
-    vibrate: [100, 50, 100]
+    vibrate: [100, 50, 100],
+    data: {
+      url: '/'
+    }
   };
 
-  // Parse push data if available
+  // تحليل بيانات الإشعار إذا كانت متوفرة
   if (event.data) {
     try {
       const pushData = event.data.json();
       notificationData = { ...notificationData, ...pushData };
     } catch (error) {
-      console.error('Failed to parse push data:', error);
+      console.error('فشل في تحليل بيانات الإشعار:', error);
     }
   }
 
@@ -311,17 +376,17 @@ self.addEventListener('push', function(event) {
     data: {
       dateOfArrival: Date.now(),
       primaryKey: notificationData.tag,
-      url: notificationData.url || '/'
+      url: notificationData.data?.url || '/'
     },
     actions: [
       {
         action: 'open',
-        title: 'Open App',
+        title: 'فتح التطبيق',
         icon: '/icons/action-open.png'
       },
       {
         action: 'dismiss',
-        title: 'Dismiss',
+        title: 'إغلاق',
         icon: '/icons/action-dismiss.png'
       }
     ]
@@ -332,18 +397,22 @@ self.addEventListener('push', function(event) {
   );
 });
 
-// Professional notification click handling
+// معالجة احترافية للنقر على الإشعارات
 self.addEventListener('notificationclick', function(event) {
-  console.log('🔔 Notification clicked:', event.action);
+  console.log('🔔 تم النقر على الإشعار:', event.action);
   
   event.notification.close();
+
+  if (event.action === 'dismiss') {
+    return;
+  }
 
   const urlToOpen = event.notification.data?.url || '/';
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true })
       .then(function(clientList) {
-        // Try to focus existing window
+        // محاولة التركيز على نافذة موجودة
         for (let i = 0; i < clientList.length; i++) {
           const client = clientList[i];
           if (client.url === urlToOpen && 'focus' in client) {
@@ -351,7 +420,7 @@ self.addEventListener('notificationclick', function(event) {
           }
         }
         
-        // Open new window if none found
+        // فتح نافذة جديدة إذا لم توجد
         if (clients.openWindow) {
           return clients.openWindow(urlToOpen);
         }
@@ -359,11 +428,11 @@ self.addEventListener('notificationclick', function(event) {
   );
 });
 
-// Enhanced error handling and logging
+// معالجة محسنة للأخطاء والتسجيل
 self.addEventListener('error', function(event) {
-  console.error('🚨 Service Worker error:', event.error);
+  console.error('🚨 خطأ Service Worker:', event.error);
   
-  // Report critical errors to clients
+  // إبلاغ الأخطاء الحرجة للعملاء
   self.clients.matchAll().then(clients => {
     clients.forEach(client => {
       client.postMessage({
@@ -375,56 +444,56 @@ self.addEventListener('error', function(event) {
   });
 });
 
-// Professional unhandled rejection handling
+// معالجة احترافية لرفض الوعود غير المعالجة
 self.addEventListener('unhandledrejection', function(event) {
-  console.error('🚨 Unhandled promise rejection in SW:', event.reason);
+  console.error('🚨 رفض غير معالج للوعد في SW:', event.reason);
   event.preventDefault();
 });
 
-// Periodic cleanup and maintenance
+// صيانة دورية وتنظيف
 function performMaintenance() {
-  console.log('🧹 Performing Service Worker maintenance...');
+  console.log('🧹 إجراء صيانة Service Worker...');
   
-  // Clean up old cache entries
+  // تنظيف إدخالات ذاكرة التخزين المؤقت القديمة
   caches.open(CACHE_NAME).then(cache => {
     cache.keys().then(requests => {
-      // Remove entries older than 24 hours (if we tracked timestamps)
-      console.log(`📦 Current cache contains ${requests.length} entries`);
+      // إزالة الإدخالات التي عمرها أكثر من 24 ساعة (إذا تتبعنا الطوابع الزمنية)
+      console.log(`📦 ذاكرة التخزين المؤقت الحالية تحتوي على ${requests.length} إدخال`);
     });
   });
 }
 
-// Schedule maintenance every 6 hours
+// جدولة الصيانة كل 6 ساعات
 setInterval(performMaintenance, 6 * 60 * 60 * 1000);
 
-// Professional startup logging
+// تسجيل احترافي لبدء التشغيل
 console.log(`
 ╔═══════════════════════════════════════════════════════════╗
 ║                SatAlign Pro Enterprise                    ║
-║              Service Worker v2.0.0                       ║
+║              Service Worker v3.0.0                       ║
 ║                                                           ║
-║  🛰️  Professional Satellite Alignment System             ║
-║  🌍  Multi-language Support (Arabic/English)             ║
-║  📱  Progressive Web Application                          ║
-║  🔒  Secure Offline Capability                           ║
-║  ⚡  Enterprise-grade Performance                         ║
+║  🛰️  نظام ضبط الأقمار الصناعية الاحترافي                ║
+║  🌍  دعم متعدد اللغات (عربي/إنجليزي)                    ║
+║  📱  تطبيق ويب تقدمي                                     ║
+║  🔒  قدرة آمنة للعمل غير المتصل                         ║
+║  ⚡  أداء على مستوى المؤسسات                            ║
 ║                                                           ║
-║  Cache: ${CACHE_NAME}                    ║
-║  Startup: ${new Date().toISOString()}                    ║
+║  ذاكرة التخزين: ${CACHE_NAME}        ║
+║  بدء التشغيل: ${new Date().toISOString()}              ║
 ╚═══════════════════════════════════════════════════════════╝
 `);
 
-// Export service worker info for debugging
+// تصدير معلومات service worker للتصحيح
 self.SW_INFO = {
   version: CACHE_NAME,
   startupTime: new Date().toISOString(),
   features: [
-    'Professional Satellite Alignment',
-    'AR Guidance System', 
-    'Multi-language Support',
-    'Offline Capability',
-    'Push Notifications',
-    'Background Sync',
-    'Enterprise Security'
+    'ضبط احترافي للأقمار الصناعية',
+    'نظام توجيه الواقع المعزز', 
+    'دعم متعدد اللغات',
+    'قدرة العمل غير المتصل',
+    'الإشعارات التحفيزية',
+    'مزامنة الخلفية',
+    'أمان المؤسسات'
   ]
 };
