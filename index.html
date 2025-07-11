@@ -63,23 +63,27 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
             background: var(--darker-bg);
             color: var(--text-primary);
-            overflow: hidden;
+            /* Fixed: Allow scrolling - remove overflow hidden */
+            overflow-x: hidden;
+            overflow-y: auto;
             position: relative;
-            height: 100vh;
-            height: 100dvh; /* Dynamic viewport height for mobile */
+            min-height: 100vh;
+            min-height: 100dvh; /* Dynamic viewport height for mobile */
             width: 100vw;
             font-weight: 400;
             letter-spacing: -0.01em;
             line-height: 1.5;
-            /* Fixed: Remove user-select: none to allow proper touch interaction */
+            /* Fixed: Allow text selection in scrollable areas */
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
-            /* Fixed: Improve touch handling */
+            /* Fixed: Improve touch handling for iOS */
             -webkit-touch-callout: none;
             -webkit-tap-highlight-color: transparent;
-            touch-action: pan-x pan-y; /* Allow panning but prevent zoom */
+            /* Fixed: Allow scrolling on iOS */
+            touch-action: manipulation;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
         }
 
         body.rtl {
@@ -90,13 +94,29 @@
             direction: ltr;
         }
 
-        /* Fixed: Improve touch targets */
+        /* Fixed: Improve touch targets and allow scrolling */
         button, select, input, .focusable {
-            touch-action: manipulation;
+            touch-action: manipulation; /* Allows tap but prevents zoom */
             -webkit-user-select: none;
             user-select: none;
             min-height: 44px; /* iOS minimum touch target */
             min-width: 44px;
+        }
+
+        /* Fixed: Allow scrolling in scrollable containers */
+        .scrollable, .control-panel {
+            touch-action: pan-y; /* Allow vertical scrolling */
+            -webkit-overflow-scrolling: touch; /* Smooth iOS scrolling */
+        }
+
+        /* Fixed: Prevent zoom but allow scrolling */
+        * {
+            touch-action: manipulation; /* Default for all elements */
+        }
+
+        /* Fixed: Allow scrolling in specific containers */
+        .control-panel, .status-panel, .loading-content {
+            touch-action: pan-y; /* Allow vertical scrolling */
         }
 
         /* Video Background - Full Screen */
@@ -386,9 +406,16 @@
             box-shadow: 0 8px 32px var(--shadow-color);
             transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
             max-height: 65vh;
+            max-height: 65dvh;
+            /* Fixed: Ensure proper scrolling on iOS */
             overflow-y: auto;
-            /* Fixed: Better scrolling on iOS */
+            overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
+            /* Fixed: Allow vertical scrolling */
+            touch-action: pan-y;
+            /* Fixed: Enable momentum scrolling on iOS */
+            -webkit-scroll-behavior: smooth;
+            scroll-behavior: smooth;
         }
 
         .control-panel.collapsed {
@@ -1861,18 +1888,28 @@
                     this.updateSatelliteTarget();
                 });
 
-                // Fixed: Better touch event handling
+                // Fixed: Better touch event handling that doesn't interfere with scrolling
                 if (this.isMobile) {
-                    // Touch events for better mobile interaction
+                    // Touch events for better mobile interaction - only for buttons
                     document.addEventListener('touchstart', this.handleTouchStart, { passive: true });
                     document.addEventListener('touchend', this.handleTouchEnd, { passive: true });
                     
-                    // Prevent pinch zoom
-                    document.addEventListener('touchmove', (e) => {
+                    // Fixed: Allow normal scrolling - don't prevent touchmove
+                    // Only prevent pinch zoom on specific elements, not globally
+                    this.elements.video.addEventListener('touchmove', (e) => {
                         if (e.touches.length > 1) {
                             e.preventDefault();
                         }
                     }, { passive: false });
+                    
+                    // Prevent zoom on AR overlay elements only
+                    document.querySelectorAll('.ar-overlay, .sky-compass, .satellite-target').forEach(element => {
+                        element.addEventListener('touchmove', (e) => {
+                            if (e.touches.length > 1) {
+                                e.preventDefault();
+                            }
+                        }, { passive: false });
+                    });
                 }
 
                 // Orientation change - Fixed with better iOS handling
@@ -1910,11 +1947,11 @@
                 }
             }
 
-            // Fixed: Touch event handlers for better iOS interaction
+            // Fixed: Touch event handlers that don't interfere with scrolling
             handleTouchStart(e) {
-                // Add visual feedback for touch interactions
-                const target = e.target.closest('button, .focusable');
-                if (target && !target.disabled) {
+                // Only add visual feedback for buttons and focusable elements, not scrollable areas
+                const target = e.target.closest('button, .lang-btn, .control-btn, .btn, .focusable');
+                if (target && !target.disabled && !target.closest('.control-panel')) {
                     target.style.transform = target.style.transform.replace('scale(1)', 'scale(0.98)') || 'scale(0.98)';
                     target.style.opacity = '0.8';
                 }
@@ -1922,8 +1959,8 @@
 
             handleTouchEnd(e) {
                 // Remove visual feedback
-                const target = e.target.closest('button, .focusable');
-                if (target) {
+                const target = e.target.closest('button, .lang-btn, .control-btn, .btn, .focusable');
+                if (target && !target.closest('.control-panel')) {
                     setTimeout(() => {
                         target.style.transform = target.style.transform.replace('scale(0.98)', 'scale(1)') || '';
                         target.style.opacity = '';
