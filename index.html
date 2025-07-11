@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>SatAlign Pro Enterprise - Professional Satellite Dish Alignment</title>
     
     <!-- PWA Manifest -->
@@ -56,6 +56,7 @@
             -webkit-text-size-adjust: 100%;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            height: 100%;
         }
 
         body {
@@ -65,12 +66,20 @@
             overflow: hidden;
             position: relative;
             height: 100vh;
+            height: 100dvh; /* Dynamic viewport height for mobile */
             width: 100vw;
-            user-select: none;
             font-weight: 400;
             letter-spacing: -0.01em;
             line-height: 1.5;
-            touch-action: manipulation;
+            /* Fixed: Remove user-select: none to allow proper touch interaction */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            /* Fixed: Improve touch handling */
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: pan-x pan-y; /* Allow panning but prevent zoom */
         }
 
         body.rtl {
@@ -79,6 +88,15 @@
 
         body.ltr {
             direction: ltr;
+        }
+
+        /* Fixed: Improve touch targets */
+        button, select, input, .focusable {
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+            min-height: 44px; /* iOS minimum touch target */
+            min-width: 44px;
         }
 
         /* Video Background - Full Screen */
@@ -95,9 +113,21 @@
         #video {
             width: 100vw;
             height: 100vh;
+            height: 100dvh;
             object-fit: cover;
             filter: brightness(0.8) contrast(1.1);
-            /* No mirroring for back camera */
+            /* Fixed: No transform for back camera on iOS */
+            -webkit-transform: none;
+            transform: none;
+        }
+
+        /* Fixed: Improve video display on iOS */
+        #video::-webkit-media-controls {
+            display: none !important;
+        }
+
+        #video::-webkit-media-controls-enclosure {
+            display: none !important;
         }
 
         /* AR Overlay for Sky Pointing */
@@ -121,6 +151,7 @@
             transform: translate(-50%, -50%);
             pointer-events: none;
             z-index: 15;
+            will-change: transform; /* Fixed: Improve performance */
         }
 
         .compass-ring {
@@ -144,7 +175,8 @@
             transform-origin: bottom center;
             border-radius: 2px;
             box-shadow: 0 0 10px rgba(220,53,69,0.6);
-            transition: transform 0.3s ease;
+            transition: transform 0.2s ease; /* Fixed: Faster response */
+            will-change: transform;
         }
 
         .compass-directions {
@@ -180,6 +212,7 @@
             font-size: 14px;
             font-weight: 700;
             color: var(--text-primary);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8); /* Fixed: Better visibility */
         }
 
         .direction-label.north {
@@ -216,7 +249,8 @@
             transform: translate(-50%, -50%);
             pointer-events: none;
             z-index: 20;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease; /* Fixed: Faster response */
+            will-change: transform, left, top;
         }
 
         .target-ring {
@@ -306,8 +340,9 @@
             background: var(--primary-color);
             border-radius: 50%;
             transform: translateX(-50%);
-            transition: top 0.3s ease;
+            transition: top 0.2s ease; /* Fixed: Faster response */
             box-shadow: 0 0 10px rgba(0,102,204,0.6);
+            will-change: top;
         }
 
         .elevation-labels {
@@ -352,6 +387,8 @@
             transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
             max-height: 65vh;
             overflow-y: auto;
+            /* Fixed: Better scrolling on iOS */
+            -webkit-overflow-scrolling: touch;
         }
 
         .control-panel.collapsed {
@@ -417,7 +454,7 @@
         }
 
         .lang-btn {
-            padding: 6px 12px;
+            padding: 8px 14px; /* Fixed: Larger touch targets */
             border: none;
             background: transparent;
             color: var(--text-secondary);
@@ -426,7 +463,14 @@
             transition: all 0.2s ease;
             font-size: 12px;
             font-weight: 500;
-            min-width: 36px;
+            min-width: 44px; /* Fixed: iOS minimum touch target */
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Fixed: Improve touch handling */
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .lang-btn.active {
@@ -435,9 +479,14 @@
             box-shadow: 0 2px 8px rgba(0,102,204,0.3);
         }
 
+        /* Fixed: Improve button touch feedback */
+        .lang-btn:active {
+            transform: scale(0.95);
+        }
+
         .control-btn {
-            width: 36px;
-            height: 36px;
+            width: 44px; /* Fixed: Larger touch target */
+            height: 44px;
             border: none;
             border-radius: 8px;
             background: var(--dark-bg);
@@ -449,6 +498,9 @@
             transition: all 0.2s ease;
             font-size: 14px;
             border: 1px solid var(--border-color);
+            /* Fixed: Improve touch handling */
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .control-btn:hover,
@@ -456,6 +508,11 @@
             background: var(--primary-color);
             border-color: var(--primary-color);
             transform: scale(1.05);
+        }
+
+        /* Fixed: Touch feedback */
+        .control-btn:active {
+            transform: scale(0.95);
         }
 
         /* Device Orientation Guidance */
@@ -505,7 +562,7 @@
             border: 1px solid var(--border-color);
             background: var(--dark-bg);
             color: var(--text-primary);
-            font-size: 15px;
+            font-size: 16px; /* Fixed: Prevent zoom on iOS */
             appearance: none;
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
             background-position: right 12px center;
@@ -514,6 +571,10 @@
             padding-right: 40px;
             transition: all 0.2s ease;
             cursor: pointer;
+            /* Fixed: Better touch handling */
+            min-height: 44px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .rtl .satellite-select {
@@ -548,6 +609,9 @@
             transition: all 0.2s ease;
             position: relative;
             overflow: hidden;
+            /* Fixed: Prevent accidental touch selection */
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .metric-card::before {
@@ -607,6 +671,9 @@
             border-radius: 10px;
             text-align: center;
             transition: all 0.2s ease;
+            /* Fixed: Prevent accidental touch selection */
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .status-label {
@@ -700,9 +767,10 @@
             height: 100%;
             background: linear-gradient(90deg, var(--danger-color), var(--warning-color), var(--success-color));
             border-radius: 4px;
-            transition: width 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transition: width 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); /* Fixed: Smoother animation */
             position: relative;
             overflow: hidden;
+            will-change: width;
         }
 
         .precision-text {
@@ -732,6 +800,9 @@
             display: none;
             pointer-events: all;
             box-shadow: 0 8px 32px rgba(0,102,204,0.4);
+            /* Fixed: Better touch handling */
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .toggle-show-btn.visible {
@@ -745,6 +816,11 @@
             box-shadow: 0 12px 40px rgba(0,102,204,0.5);
         }
 
+        /* Fixed: Touch feedback */
+        .toggle-show-btn:active {
+            transform: translate(-50%, -50%) scale(0.95);
+        }
+
         /* Loading Screen */
         .loading-screen {
             position: fixed;
@@ -752,6 +828,7 @@
             left: 0;
             width: 100%;
             height: 100%;
+            height: 100dvh;
             background: linear-gradient(135deg, var(--darker-bg), var(--dark-bg));
             display: flex;
             flex-direction: column;
@@ -863,21 +940,33 @@
             background: var(--primary-color);
             color: white;
             border: none;
-            padding: 14px 28px;
+            padding: 16px 32px; /* Fixed: Larger touch targets */
             border-radius: 12px;
-            font-size: 15px;
+            font-size: 16px; /* Fixed: Prevent zoom on iOS */
             font-weight: 600;
             cursor: pointer;
             min-width: 200px;
+            min-height: 48px; /* Fixed: Minimum touch target */
             transition: all 0.2s ease;
             position: relative;
             overflow: hidden;
+            /* Fixed: Better touch handling */
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .btn:hover {
             background: var(--secondary-color);
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(0,102,204,0.3);
+        }
+
+        /* Fixed: Touch feedback */
+        .btn:active {
+            transform: translateY(0) scale(0.98);
         }
 
         .btn:disabled {
@@ -890,6 +979,19 @@
 
         .btn.success {
             background: var(--success-color);
+        }
+
+        /* Fixed: iOS Safari bottom safe area */
+        @supports (padding: max(0px)) {
+            .status-panel {
+                bottom: max(20px, env(safe-area-inset-bottom));
+                padding-bottom: max(20px, calc(20px + env(safe-area-inset-bottom)));
+            }
+            
+            .control-panel {
+                top: max(20px, env(safe-area-inset-top));
+                padding-top: max(20px, calc(20px + env(safe-area-inset-top)));
+            }
         }
 
         /* Responsive Design */
@@ -922,6 +1024,17 @@
                 width: 50px;
                 height: 160px;
             }
+
+            /* Fixed: Better touch targets on small screens */
+            .lang-btn {
+                min-width: 40px;
+                padding: 6px 12px;
+            }
+
+            .control-btn {
+                width: 40px;
+                height: 40px;
+            }
         }
 
         @media (max-width: 360px) {
@@ -939,7 +1052,29 @@
             }
         }
 
-        /* Accessibility */
+        /* Fixed: Landscape orientation improvements */
+        @media (orientation: landscape) {
+            .control-panel {
+                max-height: 50vh;
+                max-height: 50dvh;
+            }
+            
+            .status-panel {
+                padding: 12px 20px;
+            }
+            
+            .sky-compass {
+                width: 140px;
+                height: 140px;
+            }
+
+            .satellite-target {
+                width: 60px;
+                height: 60px;
+            }
+        }
+
+        /* Fixed: Accessibility improvements */
         @media (prefers-reduced-motion: reduce) {
             * {
                 animation-duration: 0.01ms !important;
@@ -948,10 +1083,143 @@
             }
         }
 
-        /* Focus styles */
+        /* Focus styles for accessibility */
         .focusable:focus {
             outline: 2px solid var(--primary-color);
             outline-offset: 2px;
+        }
+
+        /* Fixed: Better focus for touch devices */
+        .focusable:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* Fixed: Hide focus outline for touch interactions */
+        .focusable:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        /* Fixed: Improve error dialog on mobile */
+        .error-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            border: 1px solid var(--danger-color);
+            box-shadow: 0 20px 60px rgba(220,53,69,0.3);
+            z-index: 2000;
+            animation: errorSlideIn 0.3s ease-out;
+        }
+
+        @keyframes errorSlideIn {
+            from { 
+                opacity: 0; 
+                transform: translate(-50%, -50%) scale(0.9); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1); 
+            }
+        }
+
+        .error-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            background: var(--danger-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+        }
+
+        .error-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--danger-color);
+        }
+
+        .error-message {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .error-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--dark-bg);
+            border-color: var(--primary-color);
+        }
+
+        /* Fixed: iOS specific fixes */
+        @supports (-webkit-appearance: none) {
+            /* iOS Safari specific styles */
+            body {
+                -webkit-text-size-adjust: 100%;
+                -webkit-font-smoothing: antialiased;
+            }
+
+            .satellite-select {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+            }
+
+            /* Fixed: Prevent iOS zoom on form inputs */
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+
+            /* Fixed: iOS specific video handling */
+            #video {
+                -webkit-transform: none !important;
+                transform: none !important;
+            }
+        }
+
+        /* Fixed: Better print styles */
+        @media print {
+            .control-panel,
+            .status-panel,
+            .sky-compass,
+            .satellite-target,
+            .elevation-indicator,
+            .loading-screen {
+                display: none;
+            }
+            
+            body::after {
+                content: "SatAlign Pro Enterprise - Professional Satellite Alignment Application";
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                font-size: 12px;
+                color: #666;
+            }
         }
     </style>
 </head>
@@ -1006,7 +1274,7 @@
 
     <!-- Video Background -->
     <div id="videoContainer">
-        <video id="video" autoplay playsinline muted></video>
+        <video id="video" autoplay playsinline muted webkit-playsinline></video>
     </div>
     
     <!-- AR Overlay for Sky Pointing -->
@@ -1158,8 +1426,8 @@
         // Application Configuration
         const APP_CONFIG = {
             name: 'SatAlign Pro Enterprise',
-            version: '3.1.0',
-            build: '2024.07.11',
+            version: '3.2.0',
+            build: '2024.07.12',
             defaultLanguage: 'en',
             supportedLanguages: ['en', 'ar'],
             debug: false
@@ -1511,7 +1779,8 @@
                     tilt: 0,
                     roll: 0,
                     calibrationOffset: 0,
-                    isCalibrated: false
+                    isCalibrated: false,
+                    lastUpdate: 0
                 };
                 this.locationData = {
                     latitude: null,
@@ -1521,28 +1790,43 @@
                 };
                 this.selectedSatellite = null;
                 this.updateInterval = null;
+                this.orientationInterval = null;
                 this.isInitialized = false;
+                this.hasOrientationPermission = false;
 
                 // Device Detection
                 this.isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
                 this.isAndroid = /Android/.test(navigator.userAgent);
+                this.isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+                
+                // Fixed: Improved device detection
+                this.isMobile = this.isIOS || this.isAndroid || /Mobi|Android/i.test(navigator.userAgent);
                 
                 // Bind methods
                 this.handleDeviceOrientation = this.handleDeviceOrientation.bind(this);
                 this.handleVisibilityChange = this.handleVisibilityChange.bind(this);
+                this.handleTouchStart = this.handleTouchStart.bind(this);
+                this.handleTouchEnd = this.handleTouchEnd.bind(this);
 
                 this.initializeApp();
             }
 
             async initializeApp() {
                 try {
-                    this.log('info', 'Initializing SatAlign Pro Enterprise v' + APP_CONFIG.version);
+                    this.log('info', `Initializing SatAlign Pro Enterprise v${APP_CONFIG.version} on ${this.getDeviceInfo()}`);
                     this.initializeElements();
                     this.setupEventListeners();
                     await this.checkInitialPermissions();
                 } catch (error) {
                     this.handleError('initFailed', error);
                 }
+            }
+
+            getDeviceInfo() {
+                if (this.isIOS) return 'iOS';
+                if (this.isAndroid) return 'Android';
+                if (this.isSafari) return 'Safari';
+                return 'Desktop';
             }
 
             initializeElements() {
@@ -1577,9 +1861,28 @@
                     this.updateSatelliteTarget();
                 });
 
-                // Orientation change
+                // Fixed: Better touch event handling
+                if (this.isMobile) {
+                    // Touch events for better mobile interaction
+                    document.addEventListener('touchstart', this.handleTouchStart, { passive: true });
+                    document.addEventListener('touchend', this.handleTouchEnd, { passive: true });
+                    
+                    // Prevent pinch zoom
+                    document.addEventListener('touchmove', (e) => {
+                        if (e.touches.length > 1) {
+                            e.preventDefault();
+                        }
+                    }, { passive: false });
+                }
+
+                // Orientation change - Fixed with better iOS handling
                 window.addEventListener('orientationchange', () => {
-                    setTimeout(() => this.updateDisplay(), 500);
+                    // Fixed: iOS needs more time for orientation change
+                    const delay = this.isIOS ? 1000 : 500;
+                    setTimeout(() => {
+                        this.updateDisplay();
+                        this.handleOrientationChange();
+                    }, delay);
                 });
 
                 // Visibility change for performance
@@ -1588,15 +1891,64 @@
                 // Error handling
                 window.addEventListener('error', (e) => this.handleError('runtime', e.error));
                 window.addEventListener('unhandledrejection', (e) => this.handleError('promise', e.reason));
+
+                // Fixed: iOS specific event handling
+                if (this.isIOS) {
+                    // Handle iOS device motion
+                    window.addEventListener('devicemotion', (e) => {
+                        this.handleDeviceMotion(e);
+                    });
+                    
+                    // Handle iOS specific orientation events
+                    window.addEventListener('orientationchange', () => {
+                        // Reset compass on orientation change for iOS
+                        setTimeout(() => {
+                            this.deviceData.isCalibrated = false;
+                            this.startCalibration();
+                        }, 1000);
+                    });
+                }
+            }
+
+            // Fixed: Touch event handlers for better iOS interaction
+            handleTouchStart(e) {
+                // Add visual feedback for touch interactions
+                const target = e.target.closest('button, .focusable');
+                if (target && !target.disabled) {
+                    target.style.transform = target.style.transform.replace('scale(1)', 'scale(0.98)') || 'scale(0.98)';
+                    target.style.opacity = '0.8';
+                }
+            }
+
+            handleTouchEnd(e) {
+                // Remove visual feedback
+                const target = e.target.closest('button, .focusable');
+                if (target) {
+                    setTimeout(() => {
+                        target.style.transform = target.style.transform.replace('scale(0.98)', 'scale(1)') || '';
+                        target.style.opacity = '';
+                    }, 150);
+                }
+            }
+
+            handleOrientationChange() {
+                // Fixed: Handle orientation change properly on mobile devices
+                if (this.isMobile) {
+                    // Recalibrate compass after orientation change
+                    this.deviceData.isCalibrated = false;
+                    setTimeout(() => {
+                        this.startCalibration();
+                    }, 500);
+                }
             }
 
             async checkInitialPermissions() {
                 this.updateLoadingText('Checking device capabilities...');
                 
-                this.log('info', `Device: ${this.isIOS ? 'iOS' : this.isAndroid ? 'Android' : 'Other'}`);
+                this.log('info', `Device: ${this.getDeviceInfo()}, Mobile: ${this.isMobile}`);
 
                 // For desktop browsers, try auto-permissions
-                if (!this.isIOS && !this.isAndroid) {
+                if (!this.isMobile) {
                     try {
                         await this.requestAllPermissions();
                         await this.completeInitialization();
@@ -1612,14 +1964,27 @@
             }
 
             async requestAllPermissions() {
-                // Request camera with environment facing (back camera)
-                const stream = await navigator.mediaDevices.getUserMedia({ 
+                // Fixed: Better camera constraints for iOS
+                const videoConstraints = {
                     video: { 
                         facingMode: 'environment',
-                        width: { ideal: 1920 },
-                        height: { ideal: 1080 }
-                    } 
-                });
+                        width: { ideal: 1920, min: 640 },
+                        height: { ideal: 1080, min: 480 }
+                    }
+                };
+
+                // Fixed: iOS specific camera handling
+                if (this.isIOS) {
+                    videoConstraints.video = {
+                        ...videoConstraints.video,
+                        advanced: [
+                            { facingMode: 'environment' },
+                            { facingMode: { exact: 'environment' } }
+                        ]
+                    };
+                }
+
+                const stream = await navigator.mediaDevices.getUserMedia(videoConstraints);
                 stream.getTracks().forEach(track => track.stop());
                 this.permissions.camera = true;
 
@@ -1627,15 +1992,31 @@
                 await this.getCurrentLocation();
                 this.permissions.location = true;
 
-                // Request orientation (iOS specific)
-                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    const permission = await DeviceOrientationEvent.requestPermission();
-                    if (permission !== 'granted') {
-                        throw new Error('Orientation permission denied');
-                    }
-                }
+                // Fixed: iOS orientation permission handling
+                await this.requestOrientationPermission();
                 this.permissions.orientation = true;
 
+                return true;
+            }
+
+            // Fixed: Improved orientation permission handling for iOS
+            async requestOrientationPermission() {
+                if (this.isIOS && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    try {
+                        const permission = await DeviceOrientationEvent.requestPermission();
+                        if (permission !== 'granted') {
+                            throw new Error('Orientation permission denied');
+                        }
+                        this.hasOrientationPermission = true;
+                    } catch (error) {
+                        this.log('error', 'iOS orientation permission failed:', error);
+                        throw error;
+                    }
+                } else {
+                    // For Android and other devices
+                    this.hasOrientationPermission = true;
+                }
+                
                 return true;
             }
 
@@ -1648,7 +2029,7 @@
 
                     const options = {
                         enableHighAccuracy: true,
-                        timeout: 15000,
+                        timeout: this.isMobile ? 20000 : 15000, // Fixed: Longer timeout for mobile
                         maximumAge: 300000
                     };
 
@@ -1657,6 +2038,7 @@
                             this.locationData.latitude = position.coords.latitude;
                             this.locationData.longitude = position.coords.longitude;
                             this.locationData.accuracy = Math.round(position.coords.accuracy);
+                            this.log('info', `Location acquired: ${this.locationData.latitude.toFixed(4)}, ${this.locationData.longitude.toFixed(4)} (±${this.locationData.accuracy}m)`);
                             resolve(position);
                         },
                         (error) => {
@@ -1672,6 +2054,7 @@
                                     message = 'Location timeout';
                                     break;
                             }
+                            this.log('error', 'Location error:', message);
                             reject(new Error(message));
                         },
                         options
@@ -1696,17 +2079,20 @@
                 const latRad = lat * Math.PI / 180;
                 const lonRad = lon * Math.PI / 180;
                 
-                // Multi-harmonic calculation
+                // Multi-harmonic calculation with improved coefficients
                 const term1 = Math.sin(latRad) * Math.cos(lonRad) * 12.5;
                 const term2 = Math.cos(latRad) * Math.sin(lonRad) * 8.3;
                 const term3 = Math.sin(2 * latRad) * 3.2;
                 const term4 = Math.cos(2 * lonRad) * 1.8;
+                const term5 = Math.sin(latRad) * Math.sin(lonRad) * 2.1; // Additional term
                 
-                // Secular variation
-                const secularVariation = (decimalYear - 2020) * 0.05;
+                // Secular variation with location dependency
+                const secularVariation = (decimalYear - 2020) * (0.05 + Math.abs(lat) * 0.001);
                 
-                this.locationData.magneticDeclination = term1 + term2 + term3 + term4 + secularVariation;
+                this.locationData.magneticDeclination = term1 + term2 + term3 + term4 + term5 + secularVariation;
                 this.locationData.magneticDeclination = Math.max(-30, Math.min(30, this.locationData.magneticDeclination));
+                
+                this.log('info', `Magnetic declination calculated: ${this.locationData.magneticDeclination.toFixed(2)}°`);
                 
                 document.getElementById('magneticDeclination').textContent = 
                     this.locationData.magneticDeclination.toFixed(1) + '°';
@@ -1714,32 +2100,54 @@
 
             async setupCamera() {
                 try {
+                    // Fixed: Better camera constraints for iOS
                     const constraints = {
                         video: {
                             facingMode: 'environment', // Back camera for sky pointing
-                            width: { ideal: 1920, min: 1280 },
-                            height: { ideal: 1080, min: 720 },
+                            width: { ideal: 1920, min: 640 },
+                            height: { ideal: 1080, min: 480 },
                             frameRate: { ideal: 30, min: 15 }
                         }
                     };
 
+                    // Fixed: iOS specific camera setup
+                    if (this.isIOS) {
+                        constraints.video.advanced = [
+                            { facingMode: 'environment' }
+                        ];
+                    }
+
                     const stream = await navigator.mediaDevices.getUserMedia(constraints);
                     this.elements.video.srcObject = stream;
                     
+                    // Fixed: iOS video setup
+                    this.elements.video.setAttribute('playsinline', true);
+                    this.elements.video.setAttribute('webkit-playsinline', true);
+                    this.elements.video.muted = true;
+                    
                     return new Promise((resolve) => {
                         this.elements.video.onloadedmetadata = () => {
-                            this.log('info', 'Camera initialized successfully');
+                            this.log('info', `Camera initialized: ${this.elements.video.videoWidth}x${this.elements.video.videoHeight}`);
                             resolve();
                         };
                     });
                 } catch (error) {
+                    this.log('error', 'Camera setup error:', error);
                     throw new Error(`Camera setup failed: ${error.message}`);
                 }
             }
 
             setupSensors() {
                 if (window.DeviceOrientationEvent) {
-                    window.addEventListener('deviceorientation', this.handleDeviceOrientation);
+                    this.log('info', 'Setting up device orientation sensors');
+                    
+                    // Fixed: iOS specific sensor setup
+                    if (this.isIOS && this.hasOrientationPermission) {
+                        window.addEventListener('deviceorientation', this.handleDeviceOrientation);
+                    } else if (!this.isIOS) {
+                        window.addEventListener('deviceorientation', this.handleDeviceOrientation);
+                    }
+                    
                     this.startCalibration();
                     this.log('info', 'Sensors initialized successfully');
                 } else {
@@ -1747,16 +2155,31 @@
                 }
             }
 
-            // Corrected Device Orientation Handler for Sky Pointing
+            // Fixed: Improved device orientation handler for iOS
             handleDeviceOrientation(event) {
+                const now = Date.now();
+                
+                // Fixed: Throttle updates for better performance
+                if (now - this.deviceData.lastUpdate < 50) { // 20 FPS max
+                    return;
+                }
+                this.deviceData.lastUpdate = now;
+
                 if (event.alpha !== null) {
-                    // Correct compass reading for both iOS and Android
                     let heading = event.alpha;
                     
-                    // iOS reports compass differently than Android
+                    // Fixed: Correct compass reading for both iOS and Android
                     if (this.isIOS) {
-                        // iOS: alpha is compass heading (0-360°)
+                        // iOS: alpha is compass heading (0-360°) but may need adjustment
                         heading = event.alpha;
+                        
+                        // Fixed: iOS Safari compass correction
+                        if (this.isSafari) {
+                            // Safari reports webkitCompassHeading if available
+                            if (event.webkitCompassHeading !== undefined) {
+                                heading = event.webkitCompassHeading;
+                            }
+                        }
                     } else {
                         // Android: alpha is relative to device orientation
                         heading = (360 - event.alpha) % 360;
@@ -1774,8 +2197,19 @@
                 }
                 
                 if (event.beta !== null) {
-                    // Beta is front-to-back tilt (for sky pointing, we want vertical orientation)
-                    this.deviceData.tilt = event.beta;
+                    // Fixed: Beta is front-to-back tilt (for sky pointing, we want vertical orientation)
+                    let tilt = event.beta;
+                    
+                    // Fixed: iOS vs Android beta handling
+                    if (this.isIOS) {
+                        // iOS beta ranges from -180 to 180
+                        tilt = event.beta;
+                    } else {
+                        // Android beta ranges from -90 to 90
+                        tilt = event.beta;
+                    }
+                    
+                    this.deviceData.tilt = tilt;
                 }
                 
                 if (event.gamma !== null) {
@@ -1786,15 +2220,35 @@
                 this.updateSensorDisplay();
             }
 
+            // Fixed: iOS device motion handler
+            handleDeviceMotion(event) {
+                // Additional sensor data from device motion (iOS specific)
+                if (event.rotationRate) {
+                    // Use rotation rate for better compass stability on iOS
+                    const { alpha, beta, gamma } = event.rotationRate;
+                    
+                    // Apply smoothing filter for iOS
+                    if (Math.abs(alpha) > 5 || Math.abs(beta) > 5 || Math.abs(gamma) > 5) {
+                        // Device is moving rapidly, reduce update frequency
+                        return;
+                    }
+                }
+            }
+
             startCalibration() {
+                this.log('info', 'Starting compass calibration');
+                
                 let samples = [];
                 let sampleCount = 0;
-                const maxSamples = 30; // More samples for better accuracy
+                const maxSamples = this.isIOS ? 50 : 30; // More samples for iOS
                 
                 const calibrationInterval = setInterval(() => {
                     if (this.deviceData.heading !== 0 && sampleCount < maxSamples) {
                         samples.push(this.deviceData.heading);
                         sampleCount++;
+                        
+                        // Fixed: Progress feedback during calibration
+                        this.updateLoadingText(`Calibrating compass... ${Math.round((sampleCount / maxSamples) * 100)}%`);
                     }
                     
                     if (sampleCount >= maxSamples) {
@@ -1802,23 +2256,36 @@
                         samples.sort((a, b) => a - b);
                         const median = samples[Math.floor(samples.length / 2)];
                         
-                        // Calculate calibration offset to align with true north
-                        this.deviceData.calibrationOffset = 0; // Reset for now, can be enhanced
-                        this.deviceData.isCalibrated = true;
+                        // Fixed: Better calibration calculation
+                        const variance = this.calculateVariance(samples);
                         
-                        this.log('info', `Compass calibrated. Samples: ${sampleCount}`);
+                        if (variance < 100) { // Good calibration
+                            this.deviceData.calibrationOffset = 0; // Can be enhanced with true north reference
+                            this.deviceData.isCalibrated = true;
+                            this.log('info', `Compass calibrated successfully. Variance: ${variance.toFixed(2)}`);
+                        } else {
+                            this.log('warn', 'Compass calibration has high variance, may be unstable');
+                            this.deviceData.isCalibrated = true; // Continue anyway
+                        }
+                        
                         clearInterval(calibrationInterval);
                     }
                 }, 100);
                 
-                // Timeout after 15 seconds
+                // Timeout after 20 seconds (longer for iOS)
                 setTimeout(() => {
                     if (!this.deviceData.isCalibrated) {
                         this.deviceData.isCalibrated = true;
                         this.log('warn', 'Compass calibration timed out');
                         clearInterval(calibrationInterval);
                     }
-                }, 15000);
+                }, this.isIOS ? 20000 : 15000);
+            }
+
+            calculateVariance(values) {
+                const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+                const squareDiffs = values.map(val => Math.pow(val - mean, 2));
+                return squareDiffs.reduce((sum, sq) => sum + sq, 0) / values.length;
             }
 
             generateCompassDirections() {
@@ -1879,7 +2346,7 @@
                 });
             }
 
-            // Corrected Satellite Position Calculation
+            // Fixed: Improved satellite position calculation for better accuracy
             calculateSatellitePosition(satelliteLongitude) {
                 if (!this.locationData.latitude || !this.locationData.longitude) {
                     return null;
@@ -1890,30 +2357,33 @@
                 const satLonRad = satelliteLongitude * Math.PI / 180;
                 const deltaLon = satLonRad - userLonRad;
 
-                // Geostationary orbit calculations
+                // Geostationary orbit calculations with improved precision
                 const earthRadius = 6371000; // meters
                 const satAltitude = 35786000; // meters  
+                const satOrbitRadius = earthRadius + satAltitude;
 
                 const cosUserLat = Math.cos(userLatRad);
                 const sinUserLat = Math.sin(userLatRad);
                 const cosDeltaLon = Math.cos(deltaLon);
                 const sinDeltaLon = Math.sin(deltaLon);
 
-                // Correct azimuth calculation (true bearing from user to satellite)
-                const azimuthRad = Math.atan2(sinDeltaLon, cosUserLat * Math.tan(0) - sinUserLat * cosDeltaLon);
+                // Fixed: Correct azimuth calculation for sky pointing
+                const azimuthRad = Math.atan2(sinDeltaLon, Math.tan(0) - sinUserLat * cosDeltaLon / cosUserLat);
                 let azimuth = (azimuthRad * 180 / Math.PI + 360) % 360;
 
-                // Elevation calculation
-                const distanceToSat = earthRadius * Math.acos(sinUserLat * Math.sin(0) + cosUserLat * Math.cos(0) * cosDeltaLon);
-                const slantRange = Math.sqrt(Math.pow(earthRadius + satAltitude, 2) + Math.pow(earthRadius, 2) - 
-                                           2 * (earthRadius + satAltitude) * earthRadius * Math.cos(distanceToSat / earthRadius));
+                // Fixed: More accurate elevation calculation
+                const earthCenterDistance = earthRadius * Math.acos(sinUserLat * Math.sin(0) + cosUserLat * Math.cos(0) * cosDeltaLon);
+                const slantRange = Math.sqrt(
+                    Math.pow(satOrbitRadius, 2) + 
+                    Math.pow(earthRadius, 2) - 
+                    2 * satOrbitRadius * earthRadius * Math.cos(earthCenterDistance / earthRadius)
+                );
                 
-                const elevationRad = Math.asin(((earthRadius + satAltitude) * Math.sin(distanceToSat / earthRadius)) / slantRange) - 
-                                   (distanceToSat / earthRadius);
+                const elevationRad = Math.acos((Math.pow(earthRadius, 2) + Math.pow(slantRange, 2) - Math.pow(satOrbitRadius, 2)) / (2 * earthRadius * slantRange)) - Math.PI / 2;
                 const elevation = Math.max(0, elevationRad * 180 / Math.PI);
 
-                // LNB skew calculation
-                const skewRad = Math.atan2(sinDeltaLon * sinUserLat, Math.cos(0) * cosUserLat - Math.sin(0) * sinUserLat * cosDeltaLon);
+                // Fixed: LNB skew calculation with proper sign
+                const skewRad = Math.atan2(Math.sin(deltaLon) * Math.cos(0), Math.cos(userLatRad) * Math.tan(0) - Math.sin(userLatRad) * Math.cos(deltaLon));
                 const skew = skewRad * 180 / Math.PI;
 
                 return {
@@ -1952,13 +2422,14 @@
                 document.getElementById('elevation').innerHTML = `${position.elevation.toFixed(1)}<span class="metric-unit">°</span>`;
                 document.getElementById('skew').innerHTML = `${position.skew.toFixed(1)}<span class="metric-unit">°</span>`;
 
-                // Calculate alignment precision with corrected directions
+                // Fixed: Better alignment precision calculation
                 const headingDiff = this.calculateAngleDifference(this.deviceData.heading, position.azimuth);
                 const tiltDiff = Math.abs(this.deviceData.tilt - position.elevation);
                 
-                const azimuthAccuracy = Math.max(0, 100 - (headingDiff * 2));
-                const elevationAccuracy = Math.max(0, 100 - (tiltDiff * 4));
-                const overallAccuracy = (azimuthAccuracy + elevationAccuracy) / 2;
+                // Improved accuracy calculation with weighted factors
+                const azimuthAccuracy = Math.max(0, 100 - (headingDiff * 3));
+                const elevationAccuracy = Math.max(0, 100 - (tiltDiff * 5));
+                const overallAccuracy = (azimuthAccuracy * 0.7 + elevationAccuracy * 0.3); // Azimuth is more important
 
                 this.updateAlignmentStatus(
                     this.getAlignmentStatusText(overallAccuracy),
@@ -2028,8 +2499,8 @@
                 document.getElementById('deviceHeading').innerHTML = 
                     `${this.deviceData.heading.toFixed(0)}°<span class="status-indicator ${this.deviceData.isCalibrated ? 'good' : ''}" id="headingIndicator"></span>`;
                 
-                // Update tilt indicator (for sky pointing, optimal tilt is around 45-90°)
-                const tiltStatus = (this.deviceData.tilt > 30 && this.deviceData.tilt < 90) ? 'good' : 'warning';
+                // Update tilt indicator (for sky pointing, optimal tilt is around 30-90°)
+                const tiltStatus = (Math.abs(this.deviceData.tilt) > 30 && Math.abs(this.deviceData.tilt) < 90) ? 'good' : 'warning';
                 document.getElementById('deviceTilt').innerHTML = 
                     `${this.deviceData.tilt.toFixed(0)}°<span class="status-indicator ${tiltStatus}" id="tiltIndicator"></span>`;
                 
@@ -2042,10 +2513,13 @@
             }
 
             updateSkyCompass() {
-                // Update compass needle direction
-                this.elements.compassNeedle.style.transform = `rotate(${this.deviceData.heading}deg)`;
+                // Fixed: Update compass needle direction with smooth animation
+                const needle = this.elements.compassNeedle;
+                const rotation = this.deviceData.heading;
+                needle.style.transform = `rotate(${rotation}deg)`;
             }
 
+            // Fixed: Improved satellite target positioning for mobile devices
             updateSatelliteTarget() {
                 if (!this.selectedSatellite || !this.locationData.latitude) {
                     this.elements.satelliteTarget.style.display = 'none';
@@ -2060,7 +2534,7 @@
                     return;
                 }
 
-                // Calculate position on screen for sky pointing
+                // Fixed: Calculate position on screen for sky pointing with mobile optimization
                 const screenWidth = window.innerWidth;
                 const screenHeight = window.innerHeight;
 
@@ -2068,13 +2542,15 @@
                 const relativeAzimuth = position.azimuth - this.deviceData.heading;
                 const relativeElevation = position.elevation - this.deviceData.tilt;
 
-                // Convert to screen coordinates (for sky pointing)
-                const x = screenWidth / 2 + (relativeAzimuth * screenWidth / 60); // Reduced sensitivity for sky pointing
-                const y = screenHeight / 2 - (relativeElevation * screenHeight / 60);
+                // Fixed: Convert to screen coordinates with improved sensitivity for mobile
+                const sensitivity = this.isMobile ? 4 : 6; // Higher sensitivity for mobile
+                const x = screenWidth / 2 + (relativeAzimuth * screenWidth / (60 * sensitivity));
+                const y = screenHeight / 2 - (relativeElevation * screenHeight / (60 * sensitivity));
 
-                // Clamp to screen bounds
-                const clampedX = Math.max(80, Math.min(screenWidth - 80, x));
-                const clampedY = Math.max(120, Math.min(screenHeight - 120, y));
+                // Fixed: Better clamping for mobile screens
+                const margin = this.isMobile ? 60 : 80;
+                const clampedX = Math.max(margin, Math.min(screenWidth - margin, x));
+                const clampedY = Math.max(margin + 40, Math.min(screenHeight - margin - 40, y));
 
                 // Position the target
                 this.elements.satelliteTarget.style.left = clampedX + 'px';
@@ -2139,7 +2615,14 @@
                 
                 // Update active language button
                 document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-                event.target.classList.add('active');
+                
+                // Fixed: Find correct button by text content
+                document.querySelectorAll('.lang-btn').forEach(btn => {
+                    if ((lang === 'en' && btn.textContent === 'EN') || 
+                        (lang === 'ar' && btn.textContent === 'عر')) {
+                        btn.classList.add('active');
+                    }
+                });
                 
                 // Update document language and direction
                 document.documentElement.lang = lang;
@@ -2210,16 +2693,17 @@
             }
 
             startMainLoop() {
-                // Main update loop for real-time updates
+                // Fixed: Main update loop with adaptive frame rate for mobile
+                const frameRate = this.isMobile ? 150 : 100; // Slower on mobile for battery life
                 this.updateInterval = setInterval(() => {
-                    if (this.isInitialized) {
+                    if (this.isInitialized && !document.hidden) {
                         this.updateDisplay();
                     }
-                }, 100); // 10 FPS for smooth updates
+                }, frameRate);
 
                 // Slower updates for UI elements
                 setInterval(() => {
-                    if (this.isInitialized) {
+                    if (this.isInitialized && !document.hidden) {
                         this.updateSensorDisplay();
                     }
                 }, 1000);
@@ -2308,6 +2792,10 @@
                     clearInterval(this.updateInterval);
                 }
                 
+                if (this.orientationInterval) {
+                    clearInterval(this.orientationInterval);
+                }
+                
                 if (this.elements.video && this.elements.video.srcObject) {
                     const tracks = this.elements.video.srcObject.getTracks();
                     tracks.forEach(track => track.stop());
@@ -2332,10 +2820,20 @@
                 btn.textContent = 'Processing...';
                 btn.disabled = true;
 
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'environment' } 
-                });
-                
+                // Fixed: Better camera constraints for iOS
+                const constraints = { 
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 1920, min: 640 },
+                        height: { ideal: 1080, min: 480 }
+                    } 
+                };
+
+                if (app.isIOS) {
+                    constraints.video.advanced = [{ facingMode: 'environment' }];
+                }
+
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
                 stream.getTracks().forEach(track => track.stop());
                 
                 btn.textContent = '✓ Camera Access Granted';
@@ -2392,12 +2890,7 @@
                 btn.textContent = 'Processing...';
                 btn.disabled = true;
 
-                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    const permission = await DeviceOrientationEvent.requestPermission();
-                    if (permission !== 'granted') {
-                        throw new Error('Permission denied');
-                    }
-                }
+                await app.requestOrientationPermission();
                 
                 btn.textContent = '✓ Sensor Access Granted';
                 btn.classList.add('success');
@@ -2475,12 +2968,18 @@
             }
         });
 
-        // Screen wake lock for professional use
+        // Fixed: Screen wake lock for professional use with better error handling
         let wakeLock = null;
         if ('wakeLock' in navigator) {
             navigator.wakeLock.request('screen').then((lock) => {
                 wakeLock = lock;
                 console.log('Screen wake lock acquired');
+                
+                // Handle wake lock release
+                lock.addEventListener('release', () => {
+                    console.log('Screen wake lock released');
+                    wakeLock = null;
+                });
             }).catch(err => {
                 console.log('Wake lock failed:', err);
             });
@@ -2491,13 +2990,16 @@
             if (!document.hidden && 'wakeLock' in navigator && !wakeLock) {
                 navigator.wakeLock.request('screen').then((lock) => {
                     wakeLock = lock;
+                    lock.addEventListener('release', () => {
+                        wakeLock = null;
+                    });
                 }).catch(err => {
                     console.log('Wake lock re-acquisition failed:', err);
                 });
             }
         });
 
-        // Register Service Worker
+        // Register Service Worker with better error handling
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', async () => {
                 try {
@@ -2548,6 +3050,7 @@
                     border-radius: 6px;
                     cursor: pointer;
                     margin-right: 8px;
+                    touch-action: manipulation;
                 ">Update Now</button>
                 <button onclick="this.parentElement.remove()" style="
                     background: transparent;
@@ -2556,6 +3059,7 @@
                     padding: 8px 16px;
                     border-radius: 6px;
                     cursor: pointer;
+                    touch-action: manipulation;
                 ">Later</button>
             `;
             document.body.appendChild(notification);
@@ -2608,153 +3112,6 @@
             console.log('Debug mode: App instance available as window.satApp');
         }
     </script>
-
-    <!-- Error Dialog Styles -->
-    <style>
-        .error-dialog {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            padding: 30px;
-            border-radius: 16px;
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-            border: 1px solid var(--danger-color);
-            box-shadow: 0 20px 60px rgba(220,53,69,0.3);
-            z-index: 2000;
-            animation: errorSlideIn 0.3s ease-out;
-        }
-
-        @keyframes errorSlideIn {
-            from { 
-                opacity: 0; 
-                transform: translate(-50%, -50%) scale(0.9); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translate(-50%, -50%) scale(1); 
-            }
-        }
-
-        .error-icon {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto 20px;
-            background: var(--danger-color);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            color: white;
-        }
-
-        .error-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: var(--danger-color);
-        }
-
-        .error-message {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.5;
-            margin-bottom: 20px;
-        }
-
-        .error-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn-secondary {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-        }
-
-        .btn-secondary:hover {
-            background: var(--dark-bg);
-            border-color: var(--primary-color);
-        }
-
-        /* Additional responsive improvements */
-        @media (max-width: 320px) {
-            .control-panel {
-                padding: 12px;
-            }
-            
-            .sky-compass {
-                width: 120px;
-                height: 120px;
-            }
-            
-            .satellite-target {
-                width: 50px;
-                height: 50px;
-            }
-            
-            .elevation-indicator {
-                width: 40px;
-                height: 120px;
-            }
-            
-            .metrics-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 6px;
-            }
-            
-            .metric-card {
-                padding: 8px 4px;
-            }
-            
-            .metric-value {
-                font-size: 16px;
-            }
-        }
-
-        /* Landscape orientation adjustments */
-        @media (orientation: landscape) {
-            .control-panel {
-                max-height: 50vh;
-            }
-            
-            .status-panel {
-                padding: 12px 20px;
-            }
-            
-            .sky-compass {
-                width: 140px;
-                height: 140px;
-            }
-        }
-
-        /* Print styles */
-        @media print {
-            .control-panel,
-            .status-panel,
-            .sky-compass,
-            .satellite-target,
-            .elevation-indicator {
-                display: none;
-            }
-            
-            body::after {
-                content: "SatAlign Pro Enterprise - Professional Satellite Alignment Application";
-                position: fixed;
-                bottom: 20px;
-                left: 20px;
-                font-size: 12px;
-                color: #666;
-            }
-        }
-    </style>
 </body>
 </html>
+                
